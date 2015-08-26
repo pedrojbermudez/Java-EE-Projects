@@ -1,0 +1,118 @@
+@CHARSET "UTF-8";
+
+body {
+	background-color: white;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+td {
+	border: 0px solid black;
+	padding-right: 5px;
+	border-collapse: collapse;
+}
+#div_inner_body{
+	margin-top: 94px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: auto;
+}
+#div_pagination {
+	text-align: right;
+}
+
+#div_menu {
+	background-color: rgb(250, 235, 215);
+	color: rgb(139, 69, 19);
+	width: 1024px;
+	margin-top: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: auto;
+	position: fixed;
+	top: 0px;
+}
+
+.span_menu_header {
+	padding-right: 10px;
+}
+
+.input_menu_login {
+	background-color: rgb(250, 235, 215);
+}
+
+#div_menu_bottom {
+	width: 425px;
+}
+
+#span_menu_bottom_new_user {
+	font-size: 12px;
+	position: relative;
+	right: -375px;
+}
+
+#button_as_text {
+	background: none;
+	border: none;
+	color: rgb(139, 69, 19);
+	margin: 0;
+	padding: 0;
+}
+input{
+	color: rgb(139, 69, 19);
+}
+#div_body {
+	background-color: rgba(255, 255, 240, 0.7);
+	color: rgb(210, 105, 30);
+	width: 1024px;
+	margin: auto;
+	margin-top: 80px;
+}
+
+a:LINK {
+	color: rgb(210, 105, 30);
+	text-decoration: none;
+}
+
+a:VISITED {
+	color: rgb(210, 105, 30);
+	text-decoration: none;
+}
+
+a:HOVER {
+	color: green;
+	text-decoration: none;
+}
+
+a:active {
+	color: red;
+	text-decoration: none;
+}
+
+.img_menu {
+	width: 24px;
+}
+
+.div_edit {
+	display: none;
+}
+
+.div_delete {
+	display: none;
+}
+
+.td_data {
+	border: 1px solid brown;
+	color: rgb(210, 105, 30);
+}
+
+.td_header {
+	border: 1px solid brown;
+	color: rgb(210, 105, 30);
+}
+
+.td_edit_delete {
+	border: 0px;
+}

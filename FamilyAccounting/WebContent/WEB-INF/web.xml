@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+	<display-name>Family Accounting</display-name>
+	<servlet>
+		<servlet-name>SourcesServ</servlet-name>
+		<servlet-class>com.family.accounting.web.Sources</servlet-class>
+		<init-param>
+			<param-name>numberElements</param-name>
+			<param-value>25</param-value>
+			<description>The number of the elements which we can see on the web
+				site.</description>
+		</init-param>
+		<init-param>
+			<param-name>numberPage</param-name>
+			<param-value>0</param-value>
+			<description>The number of page.</description>
+		</init-param>
+		<init-param>
+			<param-name>userId</param-name>
+			<param-value>-1</param-value>
+			<description>The initial user ID when he/she is not logged.</description>
+		</init-param>
+		<init-param>
+			<param-name>mode</param-name>
+			<param-value>-1</param-value>
+			<description>The initial mode. It depends if you want to create
+				(mode=0) or edit (mode=1) or delete (mode=2) or just view(mode=-1)</description>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>MovementsServ</servlet-name>
+		<servlet-class>com.family.accounting.web.Movements</servlet-class>
+		<init-param>
+			<param-name>numberElements</param-name>
+			<param-value>25</param-value>
+			<description>The number of the elements which we can see on the web
+				site.</description>
+		</init-param>
+		<init-param>
+			<param-name>numberPage</param-name>
+			<param-value>0</param-value>
+			<description>The number of page.</description>
+		</init-param>
+		<init-param>
+			<param-name>userId</param-name>
+			<param-value>-1</param-value>
+			<description>The initial user ID when he/she is not logged.</description>
+		</init-param>
+		<init-param>
+			<param-name>mode</param-name>
+			<param-value>-1</param-value>
+			<description>The initial mode. It depends if you want to create
+				(mode=0) or edit (mode=1) or delete (mode=2) or just view(mode=-1)</description>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>CategoriesServ</servlet-name>
+		<servlet-class>com.family.accounting.web.Categories</servlet-class>
+		<init-param>
+			<param-name>numberElements</param-name>
+			<param-value>25</param-value>
+			<description>The number of the elements which we can see on the web
+				site.</description>
+		</init-param>
+		<init-param>
+			<param-name>numberPage</param-name>
+			<param-value>0</param-value>
+			<description>The number of page.</description>
+		</init-param>
+		<init-param>
+			<param-name>userId</param-name>
+			<param-value>-1</param-value>
+			<description>The initial user ID when he/she is not logged.</description>
+		</init-param>
+		<init-param>
+			<param-name>mode</param-name>
+			<param-value>-1</param-value>
+			<description>The initial mode. It depends if you want to create
+				(mode=0) or edit (mode=1) or delete (mode=2) or just view(mode=-1)</description>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>UserServ</servlet-name>
+		<servlet-class>com.family.accounting.web.User</servlet-class>
+		<init-param>
+			<param-name>userId</param-name>
+			<param-value>-1</param-value>
+			<description>The initial user ID when he/she is not logged.</description>
+		</init-param>
+		<init-param>
+			<param-name>mode</param-name>
+			<param-value>-1</param-value>
+			<description>The initial mode. It depends if you want to create
+				(mode=0) or edit (mode=1) or delete (mode=2) or just view(mode=-1)</description>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SourcesServ</servlet-name>
+		<url-pattern>/sources</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>MovementsServ</servlet-name>
+		<url-pattern>/movements</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CategoriesServ</servlet-name>
+		<url-pattern>/categories</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>UserServ</servlet-name>
+		<url-pattern>/user</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>/sources</welcome-file>
+	</welcome-file-list>
+</web-app>  
