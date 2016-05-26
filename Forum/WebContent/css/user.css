@@ -1,0 +1,10 @@
+@CHARSET "ISO-8859-1";
+
+.div_user_content{
+	
+}
+
+#img_avatar{
+	max-width: 60px;
+	max-height: 60px;
+}

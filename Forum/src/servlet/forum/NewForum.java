@@ -1,0 +1,45 @@
+
+package servlet.forum;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import database.ForumDB;
+
+public class NewForum extends HttpServlet {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 8041493382136314010L;
+
+  public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    HttpSession session = request.getSession();
+    String[] tmp = request.getParameterValues("forum_mod_users");
+
+    int[] moderators = new int[tmp.length];
+    for (int i = 0; i < moderators.length; i++) {
+      moderators[i] = Integer.parseInt(tmp[i]);
+    }
+    int forumId = session != null
+        && Integer.parseInt(session.getAttribute("id").toString()) == 1
+            ? (new ForumDB()).newForum(moderators,
+                request.getParameter("forum_name"),
+                request.getParameter("forum_description"),
+                Integer.parseInt(request.getParameter("forum_category_id")))
+            : -1;
+    try {
+      if (forumId != -1) {
+        response.sendRedirect("/Forum/forum.jsp?cid="
+            + request.getParameter("forum_category_id") + "&fid=" + forumId);
+      } else {
+        response.sendRedirect("/Forum/index.jsp");
+      }
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    }
+  }
+}
