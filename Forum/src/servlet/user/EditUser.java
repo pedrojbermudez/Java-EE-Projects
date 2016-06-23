@@ -3,8 +3,10 @@ package servlet.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import sun.security.provider.MD5;
 import utils.ExtractFileName;
 import utils.MD5Checksum;
 
+@MultipartConfig
 public class EditUser extends HttpServlet {
 
   /**
@@ -34,34 +37,46 @@ public class EditUser extends HttpServlet {
   protected void doPost(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession();
-    // getting app path and let into default save path.
+    String fileName;
+    // creating directory
     String appPath = request.getServletContext().getRealPath("");
     String savePath = appPath + File.separator + Constant.SAVE_IMAGE_DIR;
-
-    // creating directory
     File fileSaveDir = new File(savePath);
     if (!fileSaveDir.exists()) {
       fileSaveDir.mkdir();
     }
-    // getting the file and write in the server.
-    Part part = request.getPart("user_profile_picture"); // name used in
-    // form.
-    String tmp = (new ExtractFileName()).extractFileName(part);
-    String fileName = tmp != null ? (new MD5Checksum(tmp)).getCheckSum()
-        : Constant.PROFILE_PICTURE_DEFAULT;
-    if (!(new File(fileName)).exists()) {
-      part.write(savePath + File.separator + fileName);
+    // getting the file and write in the server and checking type name "path"
+    if(request.getParameter("path").isEmpty() || request.getParameter("path").equals("")){
+      Part part = request.getPart("user_profile_picture"); // name used in
+      // form.
+      fileName = (new ExtractFileName()).extractFileName(part);
+      if (!fileName.isEmpty()) {
+        String ext = fileName.substring(fileName.lastIndexOf('.'));
+        fileName = (new MD5Checksum(part.getInputStream())).getCheckSum();
+        if (!(new File(savePath + File.separator + fileName)).exists()) {
+          part.write(savePath + File.separator + fileName + ext);
+        }
+        fileName = (Constant.SAVE_IMAGE_DIR + File.separator + fileName + ext)
+            .replace("\\", "\\\\");
+      } else {
+        fileName = Constant.PROFILE_PICTURE_DEFAULT;
+      }
+    } else {
+      fileName = request.getParameter("path"); 
     }
-    if (!db.editUser(Integer.parseInt(session.getAttribute("id").toString()),
-        request.getParameter("user_name"), request.getParameter("user_surname"),
-        (savePath.replace("\\", "/") + "/" + fileName),
-        request.getParameter("user_country"),
-        request.getParameter("user_state"),
-        request.getParameter("user_city"))) {
+    if ((Integer.parseInt(session.getAttribute("id").toString()) == 1
+        || Integer.parseInt(session.getAttribute("id").toString()) == Integer
+            .parseInt(request.getParameter("user_id")))
+        && !db.editUser(Integer.parseInt(request.getParameter("user_id")),
+            request.getParameter("user_name"),
+            request.getParameter("user_surname"), (fileName),
+            request.getParameter("user_country"),
+            request.getParameter("user_state"),
+            request.getParameter("user_city"))) {
       response.setHeader("Edit_User", "ok");
     } else {
       response.setHeader("Edit_User", "error");
     }
-    response.sendRedirect("index.jsp");
+    response.sendRedirect("/Forum/index.jsp");
   }
 }

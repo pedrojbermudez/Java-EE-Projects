@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpSession;
 
 import database.PostDB;
+import database.ThreadDB;
 
 public class GetterPost {
   private PostDB db;
@@ -19,26 +20,38 @@ public class GetterPost {
     list = db.getPosts(threadId);
   }
 
-  public String getPostsWeb(int threadId, HttpSession session) {
+  /**
+   * Return an String array first element for title and second for post
+   * 
+   * @param threadId
+   * @param session
+   * @return
+   */
+  public String[] getPostsWeb(int threadId, HttpSession session) {
     setPosts(threadId);
+    String[] content = new String[2];
     int userId = session != null && session.getAttribute("id") != null
         && session.getAttribute("id").toString().matches("^\\d+$")
             ? Integer.parseInt(session.getAttribute("id").toString()) : -1;
     StringBuilder sb = new StringBuilder();
     int forumId = (new GetterForum()).getForumId(threadId);
     for (String[] post : list) {
+      sb.append("<div class=\"div_post_outer\">");
       String imgPath = post[6].replace("\\", "/");
-      sb.append("<div class=\"div_outer\"><div class=\"div_user_info\">"
-          + "<span class=\"span_user_name\"><a href=\"user.jsp?uid=" + post[1]
-          + "\">" + post[5] + "</a></span><br><img src=\"" + imgPath
-          + "\" class=\"img_profile_picture\"></div>"
-          + "<div class=\"div_post_content\"><div class=\"div_post_date\">"
-          + post[3] + "</div><div class=\"div_post\">"
+      // writing user info
+      sb.append("<div class=\"div_user_info\"><span class=\"span_user_name\">"
+          + "<a href=\"user.jsp?uid=" + post[1] + "\">" + post[5]
+          + "</a></span><br><img src=\"" + imgPath
+          + "\" class=\"img_profile_picture\"></div>");
+      // writing post content
+      sb.append("<div class=\"div_post_content\"><div class=\"div_post_date\">"
+          + "<span>Created on: " + post[3] + "</span></div><div class=\"div_post\">"
           + "<span class=\"span_post\">" + post[2] + "</span></div>"
-          + "</div><div class=\"div_modification_date\">"
-          + (post[4] != null ? post[4] : "") + "</div></div>");
-      ArrayList<String[]> moderators = (new GetterUser())
-          .getListModUsers(forumId);
+          + "<div class=\"div_modification_date\">"
+          + (post[4] != null ? "Modified on: " + post[4] : "") + "</div></div>");
+      // adding edit anchor
+      ArrayList<Integer> moderators = (new GetterUser())
+          .getListModUserIds(forumId);
       if (userId == Integer.parseInt(post[1])
           || (session != null && session.getAttribute("id") != null
               && session.getAttribute("id").toString().matches("^\\d+$")
@@ -52,8 +65,11 @@ public class GetterPost {
                 + threadId + "&pid=" + post[0]
                 + "\">Edit post</a></span></div>");
       }
+      sb.append("</div>");
     }
-    return sb.toString();
+    content[0] = (new ThreadDB()).getThreadTitle(threadId);
+    content[1] = sb.toString();
+    return content;
   }
 
   /**

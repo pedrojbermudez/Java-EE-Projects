@@ -14,6 +14,7 @@ import constants.Constant;
 public class ThreadDB {
   private Connection conn;
   private DBConnection db;
+  private PreparedStatement stm;
 
   public ThreadDB() {
 
@@ -30,7 +31,7 @@ public class ThreadDB {
    */
   public int newThread(int forumId, int userId, String title) {
     int threadId = -1;
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       stm = conn
@@ -50,7 +51,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -60,10 +61,11 @@ public class ThreadDB {
 
   public boolean editThread(int threadId, int forumId, String title) {
     boolean done = false;
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
-      System.out.println("thread id => " + threadId + " | forum id => " + forumId);
+      System.out
+          .println("thread id => " + threadId + " | forum id => " + forumId);
       stm = conn.prepareStatement("update " + Constant.THREAD_TABLE
           + " set forum_id=?, name=? where id=?");
       stm.setInt(1, forumId);
@@ -75,7 +77,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -85,7 +87,7 @@ public class ThreadDB {
 
   public boolean moveThreadToForum(int threadId, int forumId) {
     boolean done = false;
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       stm = conn.prepareStatement(
@@ -98,7 +100,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -108,11 +110,11 @@ public class ThreadDB {
 
   public boolean deleteThread(int threadId) {
     boolean done = false;
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       stm = conn
-          .prepareStatement("delete " + Constant.THREAD_TABLE + " where id=?");
+          .prepareStatement("delete from " + Constant.THREAD_TABLE + " where id=?");
       stm.setInt(1, threadId);
       stm.executeUpdate();
       done = true;
@@ -120,7 +122,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -130,11 +132,11 @@ public class ThreadDB {
 
   public boolean deleteThreadByForum(int forumId) {
     boolean done = false;
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       stm = conn.prepareStatement(
-          "delete " + Constant.THREAD_TABLE + " where forum_id=?");
+          "delete from " + Constant.THREAD_TABLE + " where forum_id=?");
       stm.setInt(1, forumId);
       stm.executeUpdate();
       done = true;
@@ -142,7 +144,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -157,7 +159,7 @@ public class ThreadDB {
    */
   public ArrayList<String[]> getThreadList(int forumId) {
     ArrayList<String[]> list = new ArrayList<>();
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       stm = conn.prepareStatement("select " + Constant.THREAD_TABLE + ".id, "
@@ -178,7 +180,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -188,7 +190,7 @@ public class ThreadDB {
 
   public ArrayList<Integer> getThreadIdList(int forumId) {
     ArrayList<Integer> list = new ArrayList<>();
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       stm = conn.prepareStatement(
@@ -202,7 +204,7 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
@@ -219,7 +221,7 @@ public class ThreadDB {
    */
   public String[] getThread(int threadId) {
     String[] thread = null;
-    PreparedStatement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
       thread = new String[3];
@@ -236,12 +238,28 @@ public class ThreadDB {
       System.err.println(e.getMessage());
     } finally {
       try {
-        close(stm);
+        close();
       } catch (SQLException e) {
         System.err.println(e.getMessage());
       }
     }
     return thread;
+  }
+  
+  public String getThreadTitle(int threadId){
+    stm = null;
+    String title;
+    try{
+      conn = db.getConnection();
+      stm = conn.prepareStatement("select name from " + Constant.THREAD_TABLE + " where id=?");
+      stm.setInt(1, threadId);
+      ResultSet rs = stm.executeQuery();      
+      title = rs.next() ? rs.getString("name") : "";
+    } catch(SQLException e){
+      System.err.println(e.getMessage());
+      title = "";
+    }
+    return title;
   }
 
   /**
@@ -251,10 +269,23 @@ public class ThreadDB {
    */
   public ArrayList<String[]> get30Threads() {
     ArrayList<String[]> threads = new ArrayList<>();
-    java.sql.Statement stm = null;
+    stm = null;
     try {
       conn = db.getConnection();
-      stm = conn.createStatement();
+      //TODO revisar todo el sql.
+      stm = conn.prepareStatement(
+          "select " + Constant.POST_TABLE + ".thread_id as thread_id, "
+              + Constant.THREAD_TABLE + ".name as thread_name, "
+              + Constant.POST_TABLE + ".user_id as user_id, "
+              + Constant.THREAD_TABLE + ".forum_id as forum_id, "
+              + Constant.USER_TABLE + ".user_name as user_name, "
+              + Constant.FORUM_TABLE + ".name as forum_name, "
+              + Constant.POST_TABLE + ".creation_date from "
+              + Constant.POST_TABLE + ", " + Constant.THREAD_TABLE + ", "
+              + Constant.USER_TABLE + ", " + Constant.FORUM_TABLE + " where "
+              + Constant.THREAD_TABLE + ".forum_id=" + Constant.FORUM_TABLE
+              + ".id and thread_id=" + Constant.THREAD_TABLE + ".id and "
+              + Constant.USER_TABLE + ".id=user_id");
       System.out
           .println("select " + Constant.POST_TABLE + ".thread_id as thread_id, "
               + Constant.THREAD_TABLE + ".name as thread_name, "
@@ -268,19 +299,7 @@ public class ThreadDB {
               + Constant.THREAD_TABLE + ".forum_id=" + Constant.FORUM_TABLE
               + ".id and thread_id=" + Constant.THREAD_TABLE + ".id and "
               + Constant.USER_TABLE + ".id=user_id");
-      ResultSet rs = stm.executeQuery(
-          "select " + Constant.POST_TABLE + ".thread_id as thread_id, "
-              + Constant.THREAD_TABLE + ".name as thread_name, "
-              + Constant.POST_TABLE + ".user_id as user_id, "
-              + Constant.THREAD_TABLE + ".forum_id as forum_id, "
-              + Constant.USER_TABLE + ".user_name as user_name, "
-              + Constant.FORUM_TABLE + ".name as forum_name, "
-              + Constant.POST_TABLE + ".creation_date from "
-              + Constant.POST_TABLE + ", " + Constant.THREAD_TABLE + ", "
-              + Constant.USER_TABLE + ", " + Constant.FORUM_TABLE + " where "
-              + Constant.THREAD_TABLE + ".forum_id=" + Constant.FORUM_TABLE
-              + ".id and thread_id=" + Constant.THREAD_TABLE + ".id and "
-              + Constant.USER_TABLE + ".id=user_id");
+      ResultSet rs = stm.executeQuery();
       /*
        * ResultSet rs = stm.executeQuery("select " + Constant.THREAD_TABLE +
        * ".id as thread_id, " + Constant.THREAD_TABLE + ".name as thread_name, "
@@ -309,8 +328,8 @@ public class ThreadDB {
     }
     return threads;
   }
-
-  private void close(PreparedStatement stm) throws SQLException {
+  
+  private void close() throws SQLException {
     if (stm != null) {
       stm.close();
     }

@@ -21,7 +21,7 @@
 		if (request.getParameter("pid") != null && request.getParameter("pid").matches("^\\d+$")) {
 			GetterPost getPost = new GetterPost();
 			String[] post = getPost.getPost(Integer.parseInt(request.getParameter("pid")));
-			ArrayList<String[]> moderators = (new GetterUser()).getListModUsers(
+			ArrayList<Integer> moderators = (new GetterUser()).getListModUserIds(
 					(new GetterForum()).getForumId(Integer.parseInt(request.getParameter("tid"))));
 			if (Integer.parseInt(session.getAttribute("id").toString()) == Integer.parseInt(post[1])
 					|| Integer.parseInt(session.getAttribute("id").toString()) == 1

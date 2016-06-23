@@ -13,12 +13,22 @@ public class DBConnection {
   private static String password;
   private static String host;
   private static Connection conn;
+  
+  // *********************************************************
+  // Change this if it is necessary. Mysql Root user, password database and
+  // host.
+  private static final String ROOT_USER = "root";
+  private static final String ROOT_PASSWORD = "toor";
+  private static final String DATABASE_NAME = "forum_db";
+  private static final String HOST = "localhost";
+  private static final String PORT = "3306";
+  // *********************************************************
 
   protected DBConnection() {
-    database = Constant.DATABASE_NAME;
-    userName = Constant.ROOT_USER;
-    password = Constant.ROOT_PASSWORD;
-    host = Constant.HOST + ":" + Constant.PORT;
+    database = DATABASE_NAME;
+    userName = ROOT_USER;
+    password = ROOT_PASSWORD;
+    host = HOST + ":" + PORT;
     conn = null;
   }
 

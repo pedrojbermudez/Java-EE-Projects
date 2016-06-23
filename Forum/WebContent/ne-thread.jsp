@@ -16,22 +16,22 @@
 		if (request.getParameter("tid") != null && request.getParameter("tid").matches("^\\d+$")) {
 			String[] thread = (new GetterThread())
 					.getThread(Integer.parseInt(request.getParameter("tid").toString()));
-			//TODO moderators para el if
+			ArrayList<Integer> moderators = (new GetterUser()).getListModUserIds(
+					(new GetterForum()).getForumId(Integer.parseInt(request.getParameter("tid"))));
 			if (Integer.parseInt(thread[2]) == Integer.parseInt(session.getAttribute("id").toString())
-					|| 1 == Integer.parseInt(session.getAttribute("id").toString())) {
-
+					|| 1 == Integer.parseInt(session.getAttribute("id").toString())
+					|| moderators.contains(Integer.parseInt(session.getAttribute("id").toString()))) {
 				title = "Edit thread: " + thread[0];
 				String admin;
 				if (Integer.parseInt(session.getAttribute("id").toString()) == 1) {
 					admin = (new GetterForum()).getForumList(Integer.parseInt(thread[1]), "forum_id");
 				} else {
-					admin = "<input type=\"hidden\" name=\"forum_id\" value=\""
-							+ thread[1] + "\">";
+					admin = "<input type=\"hidden\" name=\"forum_id\" value=\"" + thread[1] + "\">";
 				}
 				webContent.append("<form action=\"edit-thread/\" method=\"POST\">"
 						+ "<input type=\"hidden\" name=\"thread_id\" value=\"" + request.getParameter("tid")
-						+ "\">" + "Name: <input type=\"text\" value=\""
-						+ thread[0] + "\" required name=\"thread_name\"" + "<br>" + admin
+						+ "\">" + "Name: <input type=\"text\" value=\"" + thread[0]
+						+ "\" required name=\"thread_name\"" + "<br>" + admin
 						+ "<input type=\"submit\" value=\"Edit\"></form>");
 			} else {
 				title = "Wrong Place";

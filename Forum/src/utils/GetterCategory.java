@@ -43,22 +43,19 @@ public class GetterCategory {
    * @param int
    * @return A HTML select
    */
-  public String getCategoryWEBSelect(String selectName, int id) {
+  public String getCategoryWEBSelect(String selectName, int categoryId) {
     StringBuilder sb = new StringBuilder();
-    setCategory();
-    sb.append("<select name=\"" + selectName + "\"");
-    for (String[] cat : categories) {
-      if (id == Integer.parseInt(cat[0])) {
-        sb.append("<option selected value=\"" + cat[0] + "\">" + cat[1]
-            + "</option>");
+    sb.append("<select name=\"" + selectName + "\" required>");
+    ArrayList<String[]> categories = (new ForumDB()).getCategories();
+    for (String[] category : categories) {
+      if (categoryId == Integer.parseInt(category[0])) {
+        sb.append("<option value=\"" + category[0] + "\" selected>"
+            + category[1] + "</option>");
       } else {
-        sb.append("<option value=\"" + cat[0] + "\">" + cat[1] + "</option>");
+        sb.append("<option value=\"" + category[0] + "\">" + category[1]
+            + "</option>");
       }
     }
     return sb.append("</select>").toString();
-  }
-
-  public String[] getCategoryWEB(int id) {
-    return db.getCategory(id);
   }
 }

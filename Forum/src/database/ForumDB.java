@@ -139,7 +139,6 @@ public class ForumDB {
       stm.setInt(3, categoryId);
       stm.setInt(4, forumId);
       stm.executeUpdate();
-      deleteModerators(forumId);
       for (int i = 0; i < moderators.length; i++) {
         stm = conn.prepareStatement("insert into " + Constant.MODERATOR_TABLE
             + " (forum_id, user_id) values (?,?)");
@@ -173,7 +172,7 @@ public class ForumDB {
     try {
       conn = db.getConnection();
       stm = conn
-          .prepareStatement("delete " + Constant.FORUM_TABLE + " where id=?");
+          .prepareStatement("delete from " + Constant.FORUM_TABLE + " where id=?");
       stm.setInt(1, forumId);
       stm.executeUpdate();
       done = true;
@@ -202,7 +201,7 @@ public class ForumDB {
     try {
       conn = db.getConnection();
       stm = conn
-          .prepareStatement("delete " + Constant.FORUM_TABLE + " where id=?");
+          .prepareStatement("delete from " + Constant.FORUM_TABLE + " where id=?");
       stm.setInt(1, categoryId);
       stm.executeUpdate();
       done = true;
@@ -224,21 +223,27 @@ public class ForumDB {
     return done;
   }
 
-  private boolean deleteModerators(int forumId) {
+  public boolean deleteModerators(int forumId) {
     boolean done = false;
     PreparedStatement stm = null;
+    DBConnection db = new DBConnection();
+    conn = db.getConnection();
     try {
+      System.out.println("delete from " + Constant.MODERATOR_TABLE + " where forum_id=8");
       stm = conn.prepareStatement(
-          "delete " + Constant.MODERATOR_TABLE + " where forum_id=?");
+          "delete from " + Constant.MODERATOR_TABLE + " where forum_id=?");
       stm.setInt(1, forumId);
       stm.executeUpdate();
       done = true;
     } catch (SQLException e) {
-      System.err.println(e.getMessage());
+      System.err.println("Delete mods => " + e.getMessage());
     } finally {
       try {
         if (stm != null) {
           stm.close();
+        }
+        if(conn != null){
+          conn.close();
         }
       } catch (SQLException e) {
         System.err.println(e.getMessage());
@@ -248,70 +253,25 @@ public class ForumDB {
   }
 
   /**
-   * 
-   * @param forumId
-   * @return ArrayList< String[] > => user_id(0), user_name(1)
-   */
-  public ArrayList<String[]> getModerators(int forumId) {
-    ArrayList<String[]> listMods = new ArrayList<>();
-    DBConnection db = new DBConnection();
-    PreparedStatement stm = null;
-    try {
-      conn = db.getConnection();
-      stm = conn.prepareStatement(
-          "select " + Constant.MODERATOR_TABLE + ".user_id as user_id, "
-              + Constant.USER_TABLE + ".user_name as user_name from "
-              + Constant.MODERATOR_TABLE + " inner join " + Constant.USER_TABLE
-              + " on " + Constant.MODERATOR_TABLE + ".user_id="
-              + Constant.USER_TABLE + ".id where forum_id=?");
-      stm.setInt(1, forumId);
-      ResultSet rs = stm.executeQuery();
-      if (rs != null) {
-        while (rs.next()) {
-          String[] tmp = { Integer.toString(rs.getInt("user_id")),
-              rs.getString("user_name") };
-          listMods.add(tmp);
-        }
-      }
-    } catch (SQLException e) {
-      System.err.println(e.getMessage());
-    } finally {
-      try {
-        if (stm != null) {
-          stm.close();
-        }
-        if (conn != null) {
-          conn.close();
-        }
-        db.close();
-      } catch (SQLException e) {
-        System.out.println(e.getMessage());
-      }
-    }
-    return listMods;
-  }
-
-  /**
    * Get a specific forum.
    * 
    * @param forumId
-   * @return String[4] => id(0), name(1), description(2), forum_id(3)
+   * @return String[3] => name(0), description(1), forum_id(2)
    */
   public String[] getForum(int forumId) {
-    String[] forum = new String[4];
+    String[] forum = new String[3];
     DBConnection db = new DBConnection();
     PreparedStatement stm = null;
     try {
       conn = db.getConnection();
-      stm = conn.prepareStatement("select id, name, description, forum_id from "
-          + Constant.FORUM_TABLE + " where forum_id=?");
+      stm = conn.prepareStatement("select name, description, forum_id from "
+          + Constant.FORUM_TABLE + " where id=?");
       stm.setInt(1, forumId);
       ResultSet rs = stm.executeQuery();
       if (rs.next()) {
-        forum[0] = Integer.toString(rs.getInt("id"));
-        forum[1] = rs.getString("name");
-        forum[2] = rs.getString("description");
-        forum[3] = Integer.toString(rs.getInt("forum_id"));
+        forum[0] = rs.getString("name");
+        forum[1] = rs.getString("description");
+        forum[2] = Integer.toString(rs.getInt("forum_id"));
       }
     } catch (SQLException e) {
       System.out.println(e.getMessage());

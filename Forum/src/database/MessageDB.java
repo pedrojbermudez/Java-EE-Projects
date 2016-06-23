@@ -46,7 +46,7 @@ public class MessageDB {
     try {
       conn = db.getConnection();
       stm = conn
-          .prepareStatement("delete " + Constant.MESSAGE_TABLE + " where id=?");
+          .prepareStatement("delete from " + Constant.MESSAGE_TABLE + " where id=?");
       stm.setInt(1, id);
       stm.executeUpdate();
       done = true;

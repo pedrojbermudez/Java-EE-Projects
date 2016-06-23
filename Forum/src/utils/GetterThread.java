@@ -27,8 +27,8 @@ public class GetterThread {
           "<div class=\"div_thread\"><span>There are not threads.</span></div>");
     } else {
       String edit;
-      ArrayList<String[]> moderators = (new GetterUser())
-          .getListModUsers(forumId);
+      ArrayList<Integer> moderators = (new GetterUser())
+          .getListModUserIds(forumId);
       for (String[] thread : threads) {
         if (session != null && session.getAttribute("id") != null
             && session.getAttribute("id").toString().matches("^\\d+$")
@@ -72,7 +72,6 @@ public class GetterThread {
     StringBuilder sb = new StringBuilder();
     set30Threads(); // 6 => thread_id(0), thread_name(1), forum_id(2),
                     // forum_name(3), user_id(4), user_name(5)
-    System.out.println("tamano de threads" + threads.size());
     if (threads.size() == 0) {
       return sb
           .append(

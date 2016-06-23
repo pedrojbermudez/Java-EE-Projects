@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import com.mysql.fabric.xmlrpc.base.Array;
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import constants.Constant;
+import jdk.nashorn.internal.runtime.linker.JavaAdapterFactory;
 
 public class UserDB {
 
@@ -41,12 +43,6 @@ public class UserDB {
     PreparedStatement stm = null;
     conn = db.getConnection();
     try {
-      System.out.println("insert into " + Constant.USER_TABLE
-          + " (name, surname, email, user_name, password, profile_picture, "
-          + "country, state, city) VALUES (\"" + name + "\", \"" + surname
-          + "\", \"" + email + "\", \"" + userName + "\", MD5('" + password
-          + "'), \"" + imgPath + "\", \"" + country + "\", \"" + state + "\",\""
-          + city + "\")");
       stm = conn.prepareStatement("insert into " + Constant.USER_TABLE
           + " (name, surname, email, user_name, password, profile_picture,"
           + "country, state, city) VALUES (?,?,?,?,md5(?),?,?,?,?)");
@@ -62,7 +58,7 @@ public class UserDB {
       stm.executeUpdate();
       done = true;
     } catch (SQLException e) {
-      System.err.println(e.getMessage());
+      System.err.println(e.getSQLState());
     } finally {
       try {
         if (stm != null) {
@@ -135,8 +131,8 @@ public class UserDB {
     conn = db.getConnection();
     try {
       stm = conn.prepareStatement(
-          "update " + Constant.USER_TABLE + " set name=?, surname=?, email=?, "
-              + "profile_image=?, country=?, state=?, city=? where id=?;");
+          "update " + Constant.USER_TABLE + " set name=?, surname=?, "
+              + "profile_picture=?, country=?, state=?, city=? where id=?;");
       stm.setString(1, name);
       stm.setString(2, surname);
       stm.setString(3, imgPath);
@@ -144,6 +140,10 @@ public class UserDB {
       stm.setString(5, state);
       stm.setString(6, city);
       stm.setInt(7, id);
+      System.out.println("sql => update " + Constant.USER_TABLE + " set name=\""
+          + name + "\", surname=\"" + surname + "\", " + "profile_image=\""
+          + imgPath + "\", country=\"" + country + "\", state=\"" + state
+          + "\", city=\"" + city + "\" where id=" + id + ";");
       stm.executeUpdate();
       status = true;
     } catch (SQLException e) {
@@ -171,14 +171,15 @@ public class UserDB {
    * @param userName
    * @return
    */
-  public boolean deleteUser(int id, String userName) {
+  public boolean deleteUser(int id) {
     boolean done = false;
     PreparedStatement stm = null;
     conn = db.getConnection();
     try {
-      stm = conn
-          .prepareStatement("delete " + Constant.USER_TABLE + " where id=?;");
-      stm.setInt(1, id);
+      stm = conn.prepareStatement(
+          "update " + Constant.USER_TABLE + " set deleted=? where id=?;");
+      stm.setInt(1, 1);
+      stm.setInt(2, id);
       stm.executeUpdate();
       done = true;
     } catch (SQLException e) {
@@ -212,19 +213,28 @@ public class UserDB {
     ResultSet rs = null;
     try {
       stm = conn.prepareStatement("select name, surname, user_name, "
-          + "profile_image, country, state, city where id=?");
+          + "profile_picture, country, state, city from " + Constant.USER_TABLE
+          + " where id=?");
       stm.setInt(1, userId);
       rs = stm.executeQuery();
       if (rs.next()) {
-        user[0] = rs.getString("name");
-        user[1] = rs.getString("surname");
+        user[0] = rs.getObject("name") == null || rs.getString("name").isEmpty()? "No name"
+            : rs.getString("name");
+        user[1] = rs.getObject("surname") == null || rs.getString("surname").isEmpty()? "No surname"
+            : rs.getString("surname");
         user[2] = rs.getString("user_name");
-        user[3] = rs.getString("profile_image");
-        user[4] = rs.getString("country");
-        user[5] = rs.getString("state");
-        user[6] = rs.getString("city");
+        user[3] = rs.getString("profile_picture");
+        user[4] = rs.getObject("country") == null
+            || rs.getString("country").isEmpty() ? "No country"
+                : rs.getString("country");
+        user[5] = rs.getObject("state") == null
+            || rs.getString("state").isEmpty() ? "No state"
+                : rs.getString("state");
+        user[6] = rs.getObject("city") == null || rs.getString("city").isEmpty()
+            ? "No city" : rs.getString("city");
       }
     } catch (SQLException e) {
+      System.err.println("There is a problem here");
       System.err.println(e.getMessage());
     } finally {
       try {
@@ -279,30 +289,41 @@ public class UserDB {
   }
 
   /**
-   * Get moderators. If you want to select all user.
+   * Get all moderators.
    * 
-   * @return user_id(0), user_name(1), forum_id(2)
+   * @return id(0), user_name(1), forum_id(2)
    */
   public ArrayList<String[]> getModUsers() {
-    // TODO
     ArrayList<String[]> users = new ArrayList<>();
     conn = db.getConnection();
-    Statement stm = null;
+    PreparedStatement stm = null;
+    ResultSet rs = null;
     try {
-      stm = conn.createStatement();
-      ResultSet rs = stm.executeQuery("select " + Constant.USER_TABLE + ".id, "
-          + Constant.USER_TABLE + ".user_name, " + Constant.MODERATOR_TABLE
-          + ".forum_id from " + Constant.USER_TABLE + " inner join "
-          + Constant.MODERATOR_TABLE + " on " + Constant.MODERATOR_TABLE
-          + ".user_id=" + Constant.USER_TABLE + ".id where is_mod=1");
+      stm = conn.prepareStatement("select id as user_id, user_name from "
+          + Constant.USER_TABLE + " where is_mod=? and id > 1");
+      stm.setInt(1, 1);
+      rs = stm.executeQuery();
       while (rs.next()) {
+        System.out.println("user id => " + rs.getInt("user_id")
+            + " | user name => " + rs.getString("user_name"));
+        String[] tmp = { Integer.toString(rs.getInt("user_id")),
+            rs.getString("user_name") };
+        users.add(tmp);
+      }
+      stm.setInt(1, 1);
+      rs = stm.executeQuery();
+      while (rs.next()) {
+        System.out.println("user id => " + rs.getInt("user_id")
+            + " | user name => " + rs.getString("user_name") + " | forum id => "
+            + rs.getInt("forum_id"));
         String[] tmp = { Integer.toString(rs.getInt("user_id")),
             rs.getString("user_name"),
             Integer.toString((rs.getInt("forum_id"))) };
         users.add(tmp);
       }
+
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      System.err.println(e.getMessage());
     } finally {
       try {
         if (stm != null) {
@@ -313,36 +334,49 @@ public class UserDB {
         }
         db.close();
       } catch (SQLException e) {
-        System.out.println(e.getMessage());
+        System.out.println(e.getSQLState());
       }
     }
     return users;
   }
 
   /**
-   * Get moderators by forum.
+   * Get all moderators by forum id.
    * 
-   * @return id(0), user_id(1), user_name(2)
+   * @return id(0), user_name(1), forum_id(2)
    */
   public ArrayList<String[]> getModUsers(int forumId) {
-    // TODO
     ArrayList<String[]> users = new ArrayList<>();
     conn = db.getConnection();
-    Statement stm = null;
+    PreparedStatement stm = null;
+    ResultSet rs = null;
     try {
-      stm = conn.createStatement();
-      ResultSet rs = stm
-          .executeQuery("select user_id, user_name as user_name from "
-              + Constant.MODERATOR_TABLE + " inner join " + Constant.USER_TABLE
-              + " on " + Constant.USER_TABLE + ".id=" + Constant.MODERATOR_TABLE
-              + ".user_id where forum_id=" + forumId);
+      stm = conn.prepareStatement("select " + Constant.USER_TABLE + ".id, "
+          + Constant.USER_TABLE + ".user_name from " + Constant.USER_TABLE
+          + " inner join " + Constant.MODERATOR_TABLE + " on "
+          + Constant.USER_TABLE + ".id=" + Constant.MODERATOR_TABLE
+          + ".user_id where " + Constant.MODERATOR_TABLE + ".forum_id=?");
+      stm.setInt(1, forumId);
+      rs = stm.executeQuery();
       while (rs.next()) {
         String[] tmp = { Integer.toString(rs.getInt("id")),
             rs.getString("user_name") };
         users.add(tmp);
       }
+      stm.setInt(1, 1);
+      rs = stm.executeQuery();
+      while (rs.next()) {
+        System.out.println("user id => " + rs.getInt("user_id")
+            + " | user name => " + rs.getString("user_name") + " | forum id => "
+            + rs.getInt("forum_id"));
+        String[] tmp = { Integer.toString(rs.getInt("user_id")),
+            rs.getString("user_name"),
+            Integer.toString((rs.getInt("forum_id"))) };
+        users.add(tmp);
+      }
+
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      System.err.println(e.getMessage());
     } finally {
       try {
         if (stm != null) {
@@ -353,7 +387,7 @@ public class UserDB {
         }
         db.close();
       } catch (SQLException e) {
-        System.out.println(e.getMessage());
+        System.out.println(e.getSQLState());
       }
     }
     return users;
@@ -365,7 +399,7 @@ public class UserDB {
    * @param forumId
    * @return
    */
-  public ArrayList<Integer> getModIdUsers(int forumId) {
+  public ArrayList<Integer> getModUserIds(int forumId) {
     ArrayList<Integer> list = new ArrayList<Integer>();
     PreparedStatement stm = null;
     conn = db.getConnection();
@@ -379,7 +413,7 @@ public class UserDB {
       }
     } catch (SQLException e) {
       System.err.println(e.getSQLState());
-    } finally{
+    } finally {
       try {
         if (stm != null) {
           stm.close();
@@ -398,16 +432,18 @@ public class UserDB {
   public boolean setModUserList(int userId, boolean mod) {
     boolean done = false;
     PreparedStatement stm = null;
+    PreparedStatement stm2 = null;
     conn = db.getConnection();
     try {
-      stm = conn.prepareStatement(mod == true
-          ? "insert into " + Constant.MODERATOR_TABLE + "(user_id) values (?)"
-          : "delete from " + Constant.MODERATOR_TABLE + " where user_id=?");
-      stm.setInt(1, userId);
+      stm = conn.prepareStatement(
+          mod ? "update " + Constant.USER_TABLE + " set is_mod=? where id=?"
+              : "update " + Constant.USER_TABLE + " set is_mod=? where id=?");
+      stm.setInt(1, mod ? 1 : 0);
+      stm.setInt(2, userId);
       stm.executeUpdate();
       done = true;
     } catch (SQLException e) {
-      System.err.println(e.getMessage());
+      System.err.println(e.getSQLState());
     } finally {
       try {
         if (stm != null) {
@@ -422,6 +458,7 @@ public class UserDB {
       }
     }
     return done;
+
   }
 
   /**
@@ -443,7 +480,7 @@ public class UserDB {
         stm = conn.prepareStatement("insert into " + Constant.BLOCKED_USER_TABLE
             + " (user_id, blocked_user_id) VALUES (?, ?)");
       } else {
-        stm = conn.prepareStatement("delete " + Constant.BLOCKED_USER_TABLE
+        stm = conn.prepareStatement("delete from " + Constant.BLOCKED_USER_TABLE
             + " where user_id=? and blocked_user_id=?");
       }
       stm.setInt(1, user);
@@ -451,7 +488,7 @@ public class UserDB {
       stm.executeUpdate();
       done = true;
     } catch (SQLException e) {
-      System.err.println(e.getMessage());
+      System.err.println(e.getSQLState());
     } finally {
       try {
         if (stm != null) {
@@ -494,7 +531,7 @@ public class UserDB {
         user.put(false, null);
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      System.out.println(e.getSQLState());
     } finally {
       try {
         if (stm != null) {
@@ -505,7 +542,7 @@ public class UserDB {
         }
         db.close();
       } catch (SQLException e) {
-        System.err.println(e.getMessage());
+        System.err.println(e.getSQLState());
       }
     }
     return user;
@@ -525,7 +562,7 @@ public class UserDB {
         user = true;
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      System.out.println(e.getSQLState());
     } finally {
       try {
         if (stm != null) {
@@ -536,7 +573,7 @@ public class UserDB {
         }
         db.close();
       } catch (SQLException e) {
-        System.err.println(e.getMessage());
+        System.err.println(e.getSQLState());
       }
     }
     return user;

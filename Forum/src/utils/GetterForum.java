@@ -3,7 +3,11 @@ package utils;
 
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import database.ForumDB;
+import database.UserDB;
 
 public class GetterForum {
   private StringBuilder sbForums;
@@ -15,20 +19,26 @@ public class GetterForum {
    * @return String with the entire list of forum.
    */
 
-  private String setForums(int categoryId) {
+  private String setForums(int categoryId, HttpSession session, HttpServletRequest request) {
     sbForums = new StringBuilder();
     sbForums.append("<div id=\"div_forum_list\">");
     ForumDB db = new ForumDB();
     ArrayList<String[]> dbForums = db.getForums(categoryId);
     if (dbForums.size() >= 1) {
       for (String[] forum : dbForums) {
-        ArrayList<String[]> dbModUsers = db
-            .getModerators(Integer.parseInt(forum[0]));
+        ArrayList<String[]> dbModUsers = (new UserDB())
+            .getModUsers(Integer.parseInt(forum[0]));
         int totalModUsers = dbModUsers.size();
+        String edit = session != null && session.getAttribute("id") != null
+            && session.getAttribute("id").toString().matches("^\\d+$")
+            && Integer.parseInt(session.getAttribute("id").toString()) == 1
+                ? "<span class=\"span_edit\"><a href=\"ne-forum.jsp?cid="
+                    + categoryId + "&fid=" + forum[0] + "\">Edit</a></span>"
+                : "";
         sbForums.append(
-            "<div><span class=\"span_forum_name\"><a href=\"/Forum/forum.jsp?cid="
+            "<div><span class=\"span_forum_name\"><a href=\"forum.jsp?cid="
                 + categoryId + "&fid=" + forum[0] + "\">" + forum[1]
-                + "</a></span><br>");
+                + "</a></span>" + edit + "<br>");
         int i = 0;
         for (String[] modUser : dbModUsers) {
           String sign;
@@ -40,7 +50,7 @@ public class GetterForum {
           }
           sbForums.append(
               mods + "<span class=\"span_mod_list\"><a class=\"anchor_mod_list\""
-                  + " href=\"/user.jsp?uid=" + modUser[0] + "\">" + modUser[1]
+                  + " href=\"user.jsp?uid=" + modUser[0] + "\">" + modUser[1]
                   + "</a>" + sign + "</span>");
           i++;
         }
@@ -59,8 +69,8 @@ public class GetterForum {
    * @param categoryId
    * @return
    */
-  public String getForums(int categoryId) {
-    setForums(categoryId);
+  public String getForums(int categoryId, HttpSession session, HttpServletRequest request) {
+    setForums(categoryId, session, request);
     return sbForums.toString();
   }
 
@@ -84,8 +94,7 @@ public class GetterForum {
    * @return
    */
   public String getForumList(int forumId, String selectName) {
-    setForumList(forumId, selectName);
-    return sbForums.toString();
+    return setForumList(forumId, selectName);
   }
 
   private String setForumList(int forumId, String selectName) {

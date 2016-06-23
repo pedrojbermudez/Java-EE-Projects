@@ -7,35 +7,15 @@
 	StringBuilder webContent = new StringBuilder();
 	MenuFooter menuFooter = new MenuFooter();
 	String title;
-	webContent.append(menuFooter.getMenu(session) + "<div id\"div_body\">");
-	if(session != null && session.getAttribute("id") != null 
-			&& Integer.parseInt(session.getAttribute("id").toString()) == 1
-			&& request.getParameter("mod").equals("true")){
-		webContent.append("<div class=\"div_user_content\">"+"</div>");
-		title = "Mod list";
-	} else if (request.getAttribute("uid") != null 
-			&& request.getParameter("uid").matches("\\d+")) {
+	webContent.append(menuFooter.getMenu(session) + "<div id=\"div_body\">");
+	if (request.getParameter("uid") != null && request.getParameter("uid").matches("\\d+")) {
 		GetterUser getUser = new GetterUser();
-		String[] user = getUser.getUser(Integer.getInteger(request.getParameter("uid").toString()));
-		title = user[2] + "'s profile";
-		webContent.append(
-			"<div class=\"div_user_content\">User name:<br>" + user[2]
-			+ "</div><div class=\"div_user_content\">Avatar:<br>"
-			+ "<img src=\"" + user[3] +"\" id=\"img_avatar\"></div>" 
-			+ "<div class=\"div_user_content\">Name:<br>" + user[0] 
-			+ " "+ user[1] + "</div>" + "<div class=\"div_user_content\">" 
-			+ "Ubication: " + user[4] + ", "  + user[5] + ", " + user[6] 
-			+ "</div>");
-		if (session != null && 
-				(Integer.parseInt(request.getParameter("uid")) 
-					== Integer.parseInt(session.getAttribute("id").toString()) 
-				|| Integer.parseInt(session.getAttribute("id").toString()) 
-					== 1)) {
-			webContent.append("<button formaction=\"ne-user.jsp?uid=" 
-				+ request.getParameter("uid") + "\">Edit</button>");
-		}
+		String[] user = getUser.getUser(Integer.parseInt(request.getParameter("uid")), session);
+		title = user[1] + "\'s profile";
+		webContent.append(user[0]);
 	} else {
 		title = "Choose a user";
+		webContent.append("<div>Choose a user<div>");
 	}
 	webContent.append("</div>" + menuFooter.getFooter());
 %>
@@ -45,9 +25,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" type="text/css" href="css/user.css">
 <link rel="stylesheet" type="text/css" href="css/main.css">
-<title><%= title %></title>
+<title><%=title%></title>
 </head>
 <body>
-	<%= webContent %>
+	<%=webContent%>
 </body>
 </html>

@@ -22,8 +22,7 @@ public class DeleteUser extends HttpServlet {
 
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    if(db.deleteUser(Integer.parseInt(request.getAttribute("userId").toString()),
-        request.getAttribute("user_name").toString())){
+    if(db.deleteUser(Integer.parseInt(request.getAttribute("userId").toString()))){
       response.setHeader("Delete_User", "ok");
     } else {
       response.setHeader("Delete_User", "error");

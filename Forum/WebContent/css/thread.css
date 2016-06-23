@@ -1,6 +1,21 @@
 @CHARSET "ISO-8859-1";
 
+.div_post_outer{
+	min-height: 130px;
+}
+
 .div_user_info {
 	float: left;
-	width: 150px;
+	width: 135px;
+	border-right: 3px solid;
+}
+.div_post_content{
+	margin-left: 3px;
+	margin-right: 3px; 
+}
+
+.img_profile_picture{
+	width: 125px;
+	margin-left: 5px;
+	height: auto;
 }

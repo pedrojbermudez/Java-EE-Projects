@@ -44,7 +44,7 @@ public class MenuFooter {
               + "</div>");
     } else {
       sb.append("<div id=\"div_login\"><span class=\"span_menu_user_name\">"
-          + "<a href=\"user.jsp?uid=" + session.getAttribute("id") + "/\">"
+          + "<a href=\"user.jsp?uid=" + session.getAttribute("id") + "\">"
           + session.getAttribute("user_name") + "</a></span>"
           + "<span class=\"span_menu_user_name\"><a href=\"login/\">Logout</a></span></div>");
     }

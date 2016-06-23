@@ -176,7 +176,7 @@ public class PostDB {
     try {
       conn = db.getConnection();
       stm = conn.prepareStatement(
-          "delete " + Constant.POST_TABLE + " where thread_id=?");
+          "delete from " + Constant.POST_TABLE + " where thread_id=?");
       stm.setInt(1, threadId);
       stm.executeUpdate();
       done = true;

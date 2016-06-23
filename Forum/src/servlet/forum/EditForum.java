@@ -21,18 +21,23 @@ public class EditForum extends HttpServlet {
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
-    String[] tmp = request.getParameterValues("moderators");
+    // Adding moderators
+    String[] tmp = request.getParameterValues("forum_mod_users");
     int[] moderators = new int[tmp.length];
-    for (int i = 0; i < tmp.length; i++) {
+    for (int i = 0; i < moderators.length; i++) {
       moderators[i] = Integer.parseInt(tmp[i]);
     }
-    if (db.editForum(moderators, request.getParameter("forum_name"),
-        request.getParameter("forum_description"),
-        Integer.parseInt(request.getParameter("forum_category_id")),
-        Integer.parseInt(request.getParameter("forum_forum_id")))) {
-      response.setHeader("Edit_Forum", "ok");
-    } else {
-      response.setHeader("Edit_Forum", "error");
+    
+    // Deleting current moderators
+    if(db.deleteModerators(Integer.parseInt(request.getParameter("forum_id")))){
+      if (db.editForum(moderators, request.getParameter("forum_name"),
+          request.getParameter("forum_description"),
+          Integer.parseInt(request.getParameter("forum_category_id")),
+          Integer.parseInt(request.getParameter("forum_id")))) {
+        response.setHeader("Edit_Forum", "ok");
+      } else {
+        response.setHeader("Edit_Forum", "error");
+      }  
     }
     try {
       response.sendRedirect(

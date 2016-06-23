@@ -8,22 +8,21 @@
 	MenuFooter menuFooter = new MenuFooter();
 	String menu = menuFooter.getMenu(session);
 	String footer = menuFooter.getFooter();
-	StringBuilder categories = new StringBuilder();
-	categories.append("<div id=\"div_body\">");
+	StringBuilder webContent = new StringBuilder();
+	webContent.append("<div id=\"div_body\">");
 	if (session != null && session.getAttribute("id") != null 
 			&& session.getAttribute("id").toString().matches("^\\d+$") 
 			&& Integer.parseInt(session.getAttribute("id").toString()) == 1) {
-		GetterCategory getterCat = new GetterCategory();
-		ArrayList<String[]> categoryList = getterCat.getCategoryList();
-		categories.append("<div><span><a href=\"ne-cat.jsp\">New Category</a></span></div>");
+		ArrayList<String[]> categoryList = (new GetterCategory()).getCategoryList();
+		webContent.append("<div><span><a href=\"ne-cat.jsp\">New Category</a></span></div>");
 		for (String[] cat : categoryList) {
-			categories.append("<span><a href=\"ne-cat.jsp?cid=" 
+			webContent.append("<span><a href=\"ne-cat.jsp?cid=" 
 				+ cat[0] + "\">" + cat[1] + "</a></span><br>");
 		}
 	} else {
-		categories.append("<span>You can't be here.</span>");
+		webContent.append("<span>You can't be here.</span>");
 	}
-	categories.append("</div>");
+	webContent.append("</div>");
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -35,7 +34,7 @@
 </head>
 <body>
 	<%=menu%>
-	<%="<br>" + categories + "<br>"%>
+	<%="<br>" + webContent + "<br>"%>
 	<%=footer%>
 </body>
 </html>

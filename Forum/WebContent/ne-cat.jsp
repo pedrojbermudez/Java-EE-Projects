@@ -20,7 +20,7 @@
 		String action;
 		if (request.getParameter("cid") != null && request.getParameter("cid").matches("^\\d+$")) {
 			category = new GetterCategory();
-			String[] cat = category.getCategoryWEB(Integer.parseInt(request.getParameter("cid")));
+			String[] cat = category.getCategory(Integer.parseInt(request.getParameter("cid")));
 			name = cat[0];
 			description = cat[1];
 			title = "Edit " + name;

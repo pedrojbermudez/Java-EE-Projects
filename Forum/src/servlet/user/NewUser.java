@@ -21,6 +21,7 @@ import javax.servlet.http.Part;
 
 import constants.Constant;
 import database.UserDB;
+import utils.ExtractFileName;
 import utils.MD5Checksum;
 
 @MultipartConfig
@@ -42,23 +43,31 @@ public class NewUser extends HttpServlet {
   protected void doPost(HttpServletRequest request,
       HttpServletResponse response) {
     try {
-      String savePath;
-      Part filePart = request.getPart("user_profile_picture");
-      if (filePart != null && filePart.getSize() > 0) {
-        savePath = Constant.SAVE_IMAGE_DIR + File.separator;
-        String md5 = (new MD5Checksum(
-            savePath + filePart.getSubmittedFileName())).getCheckSum();
-        filePart.write(savePath + md5);
-        savePath += md5;
-      } else {
-        savePath = Constant.PROFILE_PICTURE_DEFAULT;
+      String appPath = request.getServletContext().getRealPath("");
+      String savePath = appPath + File.separator + Constant.SAVE_IMAGE_DIR;
+      File fileSaveDir = new File(savePath);
+      if (!fileSaveDir.exists()) {
+        fileSaveDir.mkdir();
       }
-      
+      // getting the file and write in the server.
+      Part part = request.getPart("user_profile_picture"); // name used in
+      // form.
+      String fileName = (new ExtractFileName()).extractFileName(part);
+      if (!fileName.isEmpty()) {
+        String ext = fileName.substring(fileName.lastIndexOf('.'));
+        fileName = (new MD5Checksum(part.getInputStream())).getCheckSum();
+        if (!(new File(savePath + File.separator + fileName)).exists()) {
+          part.write(savePath + File.separator + fileName + ext);
+        }
+        fileName = Constant.SAVE_IMAGE_DIR + File.separator + fileName + ext;
+      } else {
+        fileName = Constant.PROFILE_PICTURE_DEFAULT;
+      }
       if (db.newUser(request.getParameter("user_name"),
           request.getParameter("user_surname"),
           request.getParameter("user_email"),
           request.getParameter("user_user_name"),
-          request.getParameter("user_password"), savePath,
+          request.getParameter("user_password"), fileName,
           request.getParameter("user_country"),
           request.getParameter("user_state"),
           request.getParameter("user_city"))) {
