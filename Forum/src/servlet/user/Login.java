@@ -26,11 +26,8 @@ public class Login extends HttpServlet {
     session.removeAttribute("user_name");
     session.removeAttribute("profile_picture");
     try {
-      if(session.getAttribute("id") == null){
-        System.out.println("estoy nulo");
-      }
       session.invalidate();
-      response.sendRedirect("/Forum/ne-forum.jsp");
+      response.sendRedirect("/Forum/index.jsp");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -39,16 +36,16 @@ public class Login extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
     Map<Boolean, String[]> user = db.login(
         request.getParameter("user_name"), request.getParameter("password"));
-    if (user.containsKey(true)) {
-      session = request.getSession(true);
-      System.out.println("\n\n\n\n\n\n\n\n");
+    session = request.getSession(true);
+    if(session.getAttribute("error") != null){
+      session.removeAttribute("error");
+    }
+    if (user != null && user.containsKey(true)) {
       String[] getUser = user.get(true);
       session.setAttribute("id", getUser[0]);
-      System.out.println("login => " + session.getAttribute("id"));
       session.setAttribute("user_name", getUser[1]);
       session.setAttribute("profile_picture", getUser[2]);
     } else {
-      // TODO error cuando se escribe mal el usuario, corregir esto
       session.setAttribute("error", "user name or password incorrect");
     }
     try {

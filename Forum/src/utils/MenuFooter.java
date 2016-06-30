@@ -1,3 +1,4 @@
+
 package utils;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import javax.servlet.http.HttpSession;
 public class MenuFooter {
   private StringBuilder menu;
   private String footer;
-  
+
   private void setMenu(HttpSession session) {
     menu = new StringBuilder();
     menu.append("<div id=\"div_menu\"><span class=\"span_menu_header\">"
@@ -33,15 +34,19 @@ public class MenuFooter {
   private String login(HttpSession session) {
     StringBuilder sb = new StringBuilder();
     if (session == null || session.getAttribute("user_name") == null) {
-      sb.append(
-          "<div id=\"div_login\"><form action =\"login/\" method=\"POST\">"
-              + "<span class=\"span_input_login\">User: <input type=\"text\" required "
-              + "name=\"user_name\"></span><span class=\"span_input_login\">"
-              + "Password: <input type=\"password\" required name=\"password\">"
-              + "</span><span class=\"span_input_login\"><input type=\"submit\" "
-              + "value=\"Log in\"></span></form><span clas=\"span_anchor_login\">"
-              + "<a id=\"anchor_new_user\" href=\"ne-user.jsp\">New user</a></span>"
-              + "</div>");
+      sb.append("<div id=\"div_login\"><form id=\"login\" action =\"login/\" "
+          + "method=\"POST\">" + "<span class=\"span_input_login\">"
+          + "User: <input type=\"text\" required "
+          + "name=\"user_name\" id=\"user_name\"></span>"
+          + "<span class=\"span_input_login\">"
+          + "Password: <input type=\"password\" id=\"password\" "
+          + "required name=\"password\">"
+          + "</span><span class=\"span_input_login\">"
+          + "<input type=\"submit\""
+          + "value=\"Log in\"></span></form>"
+          + "<span clas=\"span_anchor_login\">"
+          + "<a id=\"anchor_new_user\" href=\"ne-user.jsp\">"
+          + "New user</a></span>" + "</div>");
     } else {
       sb.append("<div id=\"div_login\"><span class=\"span_menu_user_name\">"
           + "<a href=\"user.jsp?uid=" + session.getAttribute("id") + "\">"
@@ -71,5 +76,16 @@ public class MenuFooter {
   public String getFooter() {
     setFooter();
     return footer;
+  }
+
+  private String setJavascript() {
+
+    String javascript = "<script type=\"text/javascript\">"
+        + "function checkUser(){\n" + "$.ajax({\n" + "type : 'post',\n"
+        + "url : 'SetModUser',\n" + "data : {\n"
+        + "user_id : $(user_name).val(),\n"
+        + "is_mod : $(checkbox).prop('checked') == true ? \"y\" : \"n\"\n"
+        + "}\n" + "});\n" + "</script>";
+    return javascript;
   }
 }

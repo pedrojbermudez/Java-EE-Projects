@@ -1,3 +1,4 @@
+<%@page import="java.util.Enumeration"%>
 <%@page import="utils.MenuFooter"%>
 <%@page import="utils.GetterThread"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
@@ -5,6 +6,11 @@
 <%
 	MenuFooter menuFooter = new MenuFooter();
 	StringBuilder content = new StringBuilder();
+	if(session != null && session.getAttribute("error") != null ){
+		content.append("<script type=\"text/javascript\">"
+		+"window.alert(\"User name or pasword incorrect.\")</script>");
+		session.removeAttribute("error");
+	}
 	content.append(menuFooter.getMenu(session) + "<div id=\"div_body\">" 
 			+ (new GetterThread()).get30Threads() 
 			+ "</div>" + menuFooter.getFooter() );

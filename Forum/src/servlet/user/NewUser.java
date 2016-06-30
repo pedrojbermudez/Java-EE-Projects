@@ -53,7 +53,7 @@ public class NewUser extends HttpServlet {
       Part part = request.getPart("user_profile_picture"); // name used in
       // form.
       String fileName = (new ExtractFileName()).extractFileName(part);
-      if (!fileName.isEmpty()) {
+      if (fileName != null && !fileName.isEmpty() || !fileName.equals("")) {
         String ext = fileName.substring(fileName.lastIndexOf('.'));
         fileName = (new MD5Checksum(part.getInputStream())).getCheckSum();
         if (!(new File(savePath + File.separator + fileName)).exists()) {
@@ -72,23 +72,35 @@ public class NewUser extends HttpServlet {
           request.getParameter("user_state"),
           request.getParameter("user_city"))) {
         // sending a confirmation email.
+        //String from = "mipruebajava@hotmail.com";
+        //String password = "Asd123asd";
+        String from = "your email";
+        String password ="your password";
         Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
+        props.setProperty("mail.transport.protocol", "smtp");
+        props.setProperty("mail.host", "smtp.live.com");
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.host", "smtp.live.com");
+        props.put("mail.smtp.socketFactory.port", "587");
+        props.put("mail.smtp.socketFactory.fallback", "false");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp-mail.outlook.com");
+        props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "587");
-        Session session = Session.getInstance(props,
+        //props.setProperty("mail.user", from);
+        //props.setProperty("mail.password", password);
+        Session session = Session.getDefaultInstance(props,
             new javax.mail.Authenticator() {
-              protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("mipruebajava@hotmail.com",
-                    "Asd123asd");
-              }
+                 protected PasswordAuthentication getPasswordAuthentication()
+                 {
+                       return new PasswordAuthentication(from, password);
+                 }
             });
+        session.setDebug(true);
         try {
-          Message message = new MimeMessage(session);
-          message.setFrom(new InternetAddress("mipruebajava@hotmail.com"));
+          MimeMessage message = new MimeMessage(session);
+          message.setFrom(new InternetAddress(from));
           message.setRecipients(Message.RecipientType.TO,
-              InternetAddress.parse("pedrojavierbermudezaraguez@live.com"));
+              InternetAddress.parse(request.getParameter("user_email")));
           message.setSubject("Registration Complete");
           message.setText("Thank you for registering in the forum,");
           Transport.send(message);
