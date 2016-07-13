@@ -43,8 +43,10 @@ public class NewUser extends HttpServlet {
   protected void doPost(HttpServletRequest request,
       HttpServletResponse response) {
     try {
+      // Setting path
       String appPath = request.getServletContext().getRealPath("");
       String savePath = appPath + File.separator + Constant.SAVE_IMAGE_DIR;
+      // Creating directory
       File fileSaveDir = new File(savePath);
       if (!fileSaveDir.exists()) {
         fileSaveDir.mkdir();
@@ -71,11 +73,11 @@ public class NewUser extends HttpServlet {
           request.getParameter("user_country"),
           request.getParameter("user_state"),
           request.getParameter("user_city"))) {
-        // sending a confirmation email.
-        //String from = "mipruebajava@hotmail.com";
-        //String password = "Asd123asd";
+        // Sending a confirmation email.
+        // Set your email and password
         String from = "your email";
-        String password ="your password";
+        String password = "your password";
+        // Setting connetion configuration
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
         props.setProperty("mail.host", "smtp.live.com");
@@ -86,17 +88,17 @@ public class NewUser extends HttpServlet {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "587");
-        //props.setProperty("mail.user", from);
-        //props.setProperty("mail.password", password);
+        props.setProperty("mail.user", from);
+        props.setProperty("mail.password", password);
         Session session = Session.getDefaultInstance(props,
             new javax.mail.Authenticator() {
-                 protected PasswordAuthentication getPasswordAuthentication()
-                 {
-                       return new PasswordAuthentication(from, password);
-                 }
+              protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+              }
             });
         session.setDebug(true);
         try {
+          // Setting message
           MimeMessage message = new MimeMessage(session);
           message.setFrom(new InternetAddress(from));
           message.setRecipients(Message.RecipientType.TO,

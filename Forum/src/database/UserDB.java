@@ -218,10 +218,11 @@ public class UserDB {
       stm.setInt(1, userId);
       rs = stm.executeQuery();
       if (rs.next()) {
-        user[0] = rs.getObject("name") == null || rs.getString("name").isEmpty()? "No name"
-            : rs.getString("name");
-        user[1] = rs.getObject("surname") == null || rs.getString("surname").isEmpty()? "No surname"
-            : rs.getString("surname");
+        user[0] = rs.getObject("name") == null || rs.getString("name").isEmpty()
+            ? "No name" : rs.getString("name");
+        user[1] = rs.getObject("surname") == null
+            || rs.getString("surname").isEmpty() ? "No surname"
+                : rs.getString("surname");
         user[2] = rs.getString("user_name");
         user[3] = rs.getString("profile_picture");
         user[4] = rs.getObject("country") == null
@@ -257,14 +258,15 @@ public class UserDB {
    * 
    * @return id(0), user_name(1), is_mod(2)
    */
-  public ArrayList<String[]> getUsers() {
+  public ArrayList<String[]> getUsers(int index, int totalElements) {
     ArrayList<String[]> users = new ArrayList<>();
     conn = db.getConnection();
     Statement stm = null;
     try {
       stm = conn.createStatement();
       ResultSet rs = stm.executeQuery("select id, user_name, is_mod from "
-          + Constant.USER_TABLE + " where id > 1");
+          + Constant.USER_TABLE + " where id > 1 limit "
+          + ((index - 1) * totalElements) + ", " + totalElements);
       while (rs.next()) {
         String[] tmp = { Integer.toString(rs.getInt("id")),
             rs.getString("user_name"), Integer.toString(rs.getInt("is_mod")) };
@@ -288,6 +290,28 @@ public class UserDB {
     return users;
   }
 
+  public int getTotalUsers() {
+    conn = db.getConnection();
+    Statement stm = null;
+    int total = 0;
+    try {
+      stm = conn.createStatement();
+      ResultSet rs = stm.executeQuery("select count(id) as count from "
+          + Constant.USER_TABLE + " where id > 1");
+      if (rs.next()) total = rs.getInt("count");
+    } catch (SQLException e) {
+      System.err.println(e.getMessage());
+    } finally {
+      try {
+        if (conn != null) conn.close();
+        if (stm != null) stm.close();
+      } catch (SQLException e) {
+        System.err.println(e.getMessage());
+      }
+    }
+    return total;
+  }
+
   /**
    * Get all moderators.
    * 
@@ -300,12 +324,10 @@ public class UserDB {
     ResultSet rs = null;
     try {
       stm = conn.prepareStatement("select id as user_id, user_name from "
-          + Constant.USER_TABLE + " where is_mod=? and id > 1");
+          + Constant.USER_TABLE + " where is_mod=? and id > 1 ");
       stm.setInt(1, 1);
       rs = stm.executeQuery();
       while (rs.next()) {
-        System.out.println("user id => " + rs.getInt("user_id")
-            + " | user name => " + rs.getString("user_name"));
         String[] tmp = { Integer.toString(rs.getInt("user_id")),
             rs.getString("user_name") };
         users.add(tmp);

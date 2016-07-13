@@ -112,7 +112,7 @@ public class PostDB {
    *         creation_date(3), modification_date(4), user_name(5),
    *         profile_picture(6)
    */
-  public ArrayList<String[]> getPosts(int threadId) {
+  public ArrayList<String[]> getPosts(int threadId, int index, int elements) {
     ArrayList<String[]> posts = new ArrayList<String[]>();
     PreparedStatement stm = null;
     try {
@@ -124,8 +124,10 @@ public class PostDB {
           + ".user_name as user_name, " + Constant.USER_TABLE
           + ".profile_picture from " + Constant.POST_TABLE + " inner join "
           + Constant.USER_TABLE + " on " + Constant.POST_TABLE + ".user_id="
-          + Constant.USER_TABLE + ".id where thread_id=?");
+          + Constant.USER_TABLE + ".id where thread_id=? limit ?,?");
       stm.setInt(1, threadId);
+      stm.setInt(2, (index - 1) * elements);
+      stm.setInt(3, elements);
       ResultSet rs = stm.executeQuery();
       if (rs != null) {
         while (rs.next()) {
@@ -141,6 +143,35 @@ public class PostDB {
       System.err.println(e.getSQLState());
     }
     return posts;
+  }
+
+  public int getTotalPosts(int threadId) {
+    int total = 0;
+    PreparedStatement stm = null;
+    try {
+      conn = db.getConnection();
+      stm = conn.prepareStatement("select count(id) as total from "
+          + Constant.POST_TABLE + " where thread_id=?");
+      stm.setInt(1, threadId);
+      ResultSet rs = stm.executeQuery();
+      if (rs.next()) {
+        total = rs.getInt("total");
+      }
+    } catch (SQLException e) {
+      System.err.println(e.getMessage());
+    } finally {
+      try {
+        if (stm != null) {
+          stm.close();
+        }
+        if (conn != null) {
+          conn.close();
+        }
+      } catch (SQLException e) {
+        System.err.println(e.getMessage());
+      }
+    }
+    return total;
   }
 
   /**

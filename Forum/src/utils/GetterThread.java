@@ -14,13 +14,21 @@ public class GetterThread {
   public GetterThread() {
     db = new ThreadDB();
   }
-
-  private void setThreads(int forumId) {
-    threads = db.getThreadList(forumId);
+  
+  private int setTotalThreads(int forumId){
+    return db.getTotalThreads(forumId);
+  }
+  
+  public int getTotalThreads(int forumId){
+    return setTotalThreads(forumId);
   }
 
-  public String getThreadsWeb(int forumId, HttpSession session) {
-    setThreads(forumId);
+  private void setThreads(int forumId, int index, int totalElements) {
+    threads = db.getThreadList(forumId, index, totalElements);
+  }
+
+  public String getThreadsWeb(int forumId, int index, int totalElements, HttpSession session) {
+    setThreads(forumId, index, totalElements);
     StringBuilder sb = new StringBuilder();
     if (threads == null || threads.size() == 0) {
       sb.append(

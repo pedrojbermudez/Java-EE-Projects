@@ -38,17 +38,12 @@ public class EditUser extends HttpServlet {
       HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession();
     String fileName;
-    // creating directory
+    // Setting path
     String appPath = request.getServletContext().getRealPath("");
     String savePath = appPath + File.separator + Constant.SAVE_IMAGE_DIR;
-    File fileSaveDir = new File(savePath);
-    if (!fileSaveDir.exists()) {
-      fileSaveDir.mkdir();
-    }
     // getting the file and write in the server and checking type name "path"
-    if(request.getParameter("path").isEmpty() || request.getParameter("path").equals("")){
-      Part part = request.getPart("user_profile_picture"); // name used in
-      // form.
+    if(request.getParameter("path").isEmpty()){
+      Part part = request.getPart("user_profile_picture");
       fileName = (new ExtractFileName()).extractFileName(part);
       if (!fileName.isEmpty()) {
         String ext = fileName.substring(fileName.lastIndexOf('.'));

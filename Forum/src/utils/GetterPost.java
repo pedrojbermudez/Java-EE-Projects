@@ -15,20 +15,30 @@ public class GetterPost {
   public GetterPost() {
     db = new PostDB();
   }
+  
+  private int setTotal(int threadId){
+    return db.getTotalPosts(threadId);
+  }
+  
+  public int getTotal(int threadId){
+    return setTotal(threadId);
+  }
 
-  private void setPosts(int threadId) {
-    list = db.getPosts(threadId);
+  private void setPosts(int threadId, int index, int elements) {
+    list = db.getPosts(threadId, index, elements);
   }
 
   /**
    * Return an String array first element for title and second for post
    * 
    * @param threadId
+   * @param index
+   * @param elements
    * @param session
    * @return
    */
-  public String[] getPostsWeb(int threadId, HttpSession session) {
-    setPosts(threadId);
+  public String[] getPostsWeb(int threadId, int index, int elements, HttpSession session) {
+    setPosts(threadId, index, elements);
     String[] content = new String[2];
     int userId = session != null && session.getAttribute("id") != null
         && session.getAttribute("id").toString().matches("^\\d+$")

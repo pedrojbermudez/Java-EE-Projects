@@ -15,6 +15,14 @@ public class GetterUser {
   public GetterUser() {
   }
 
+  private int setTotalUser(){
+    return (new UserDB()).getTotalUsers();
+  }
+  
+  public int getTotalUser(){
+    return setTotalUser();
+  }
+  
   private void setModUsers(int forumId) {
     sbUser = new StringBuilder();
     UserDB userDB = new UserDB();
@@ -177,14 +185,14 @@ public class GetterUser {
    * @param numberPage
    * @return
    */
-  public String getUserList(int numberPage) {
-    setUserList(numberPage);
+  public String getUserList(int numberPage, int index, int totalElements) {
+    setUserList(numberPage, index, totalElements);
     return sbUser.toString();
   }
 
-  private void setUserList(int numberPage) {
+  private void setUserList(int numberPage, int index, int totalElements) {
     sbUser = new StringBuilder();
-    ArrayList<String[]> listUser = (new UserDB()).getUsers();
+    ArrayList<String[]> listUser = (new UserDB()).getUsers(index, totalElements);
     String checkboxName = "mod_user";
     sbUser.append("<form action=\"\" method=\"POST\">");
     for (String[] user : listUser) {

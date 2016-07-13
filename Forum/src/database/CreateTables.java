@@ -10,6 +10,9 @@ import constants.Constant;
 public class CreateTables {
   Connection conn;
 
+  /**
+   * Create the used tables
+   */
   public CreateTables() {
     conn = (new DBConnection()).getConnection();
     createTables();

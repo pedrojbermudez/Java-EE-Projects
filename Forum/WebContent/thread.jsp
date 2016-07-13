@@ -1,3 +1,4 @@
+<%@page import="utils.Pagination"%>
 <%@page import="utils.MenuFooter"%>
 <%@page import="utils.GetterPost"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
@@ -9,6 +10,8 @@
 	GetterPost getterPost = new GetterPost();
 	String[] threadContent;
 	String title;
+	// Getting the current page
+		int cp = request.getParameter("p") != null ? Integer.parseInt(request.getParameter("p")) : 1;
 	if(request.getParameter("tid") == null){
 		title = "Select a forum";
 		content.append("<span>Please select a forum.</span>");
@@ -18,13 +21,15 @@
 		content.append("<span>Please select a valid forum.</span>");
 	}
 	else{
-		threadContent = getterPost.getPostsWeb(Integer.parseInt(request.getParameter("tid")), session);
+		threadContent = getterPost.getPostsWeb(Integer.parseInt(request.getParameter("tid")), cp, 25, session);
 		title = threadContent[0];
 		content.append((session != null && session.getAttribute("id") != null 
 				&& session.getAttribute("id").toString().matches("^\\d+$") 
 				? "<span><a href=\"ne-post.jsp?tid=" + request.getParameter("tid")
 				+ "\">New post</a></span><br>" 
-				: "" ) + threadContent[1]);
+				: "" ) + threadContent[1] + (new Pagination(
+						(new GetterPost()).getTotal(Integer.parseInt(request.getParameter("tid"))),
+						25)).getPag(cp, request.getRequestURL().toString(), request.getQueryString()));
 		
 	}
 	content.append("</div><br>" + menuFooter.getFooter());

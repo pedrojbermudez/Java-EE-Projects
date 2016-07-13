@@ -113,8 +113,8 @@ public class ThreadDB {
     stm = null;
     try {
       conn = db.getConnection();
-      stm = conn
-          .prepareStatement("delete from " + Constant.THREAD_TABLE + " where id=?");
+      stm = conn.prepareStatement(
+          "delete from " + Constant.THREAD_TABLE + " where id=?");
       stm.setInt(1, threadId);
       stm.executeUpdate();
       done = true;
@@ -157,7 +157,8 @@ public class ThreadDB {
    * @param forumId
    * @return ArrayList < String[] > => id(0), name(1), author(2), user_name(3)
    */
-  public ArrayList<String[]> getThreadList(int forumId) {
+  public ArrayList<String[]> getThreadList(int forumId, int index,
+      int totalElements) {
     ArrayList<String[]> list = new ArrayList<>();
     stm = null;
     try {
@@ -167,7 +168,15 @@ public class ThreadDB {
           + ".author, " + Constant.USER_TABLE + ".user_name as user_name  from "
           + Constant.THREAD_TABLE + " inner join " + Constant.USER_TABLE
           + " on " + Constant.USER_TABLE + ".id=" + Constant.THREAD_TABLE
-          + ".author where forum_id=?");
+          + ".author where forum_id=? limit " + ((index - 1) * totalElements)
+          + ", " + totalElements);
+      System.out.println("select " + Constant.THREAD_TABLE + ".id, "
+          + Constant.THREAD_TABLE + ".name, " + Constant.THREAD_TABLE
+          + ".author, " + Constant.USER_TABLE + ".user_name as user_name  from "
+          + Constant.THREAD_TABLE + " inner join " + Constant.USER_TABLE
+          + " on " + Constant.USER_TABLE + ".id=" + Constant.THREAD_TABLE
+          + ".author where forum_id=" + forumId + " limit "
+          + ((index - 1) * totalElements) + ", " + totalElements);
       stm.setInt(1, forumId);
       ResultSet rs = stm.executeQuery();
       while (rs.next()) {
@@ -212,6 +221,22 @@ public class ThreadDB {
     return list;
   }
 
+  public int getTotalThreads(int forumId) {
+    stm = null;
+    int total = 0;
+    try {
+      conn = db.getConnection();
+      stm = conn.prepareStatement("select count(id) as count from "
+          + Constant.THREAD_TABLE + " where forum_id=?");
+      stm.setInt(1, forumId);
+      ResultSet rs = stm.executeQuery();
+      if (rs.next()) total = rs.getInt("count");
+    } catch (SQLException e) {
+      System.err.println(e.getMessage());
+    }
+    return total;
+  }
+
   /**
    * Get a thread. String size depends on the session.
    * 
@@ -245,17 +270,18 @@ public class ThreadDB {
     }
     return thread;
   }
-  
-  public String getThreadTitle(int threadId){
+
+  public String getThreadTitle(int threadId) {
     stm = null;
     String title;
-    try{
+    try {
       conn = db.getConnection();
-      stm = conn.prepareStatement("select name from " + Constant.THREAD_TABLE + " where id=?");
+      stm = conn.prepareStatement(
+          "select name from " + Constant.THREAD_TABLE + " where id=?");
       stm.setInt(1, threadId);
-      ResultSet rs = stm.executeQuery();      
+      ResultSet rs = stm.executeQuery();
       title = rs.next() ? rs.getString("name") : "";
-    } catch(SQLException e){
+    } catch (SQLException e) {
       System.err.println(e.getMessage());
       title = "";
     }
@@ -272,11 +298,12 @@ public class ThreadDB {
     stm = null;
     try {
       conn = db.getConnection();
-      //TODO revisar todo el sql.
+      // TODO revisar todo el sql.
       stm = conn.prepareStatement(
           "select " + Constant.POST_TABLE + ".thread_id as thread_id, "
               + Constant.THREAD_TABLE + ".name as thread_name, "
               + Constant.POST_TABLE + ".user_id as user_id, "
+              + Constant.THREAD_TABLE + ".author as author, "
               + Constant.THREAD_TABLE + ".forum_id as forum_id, "
               + Constant.USER_TABLE + ".user_name as user_name, "
               + Constant.FORUM_TABLE + ".name as forum_name, "
@@ -285,7 +312,7 @@ public class ThreadDB {
               + Constant.USER_TABLE + ", " + Constant.FORUM_TABLE + " where "
               + Constant.THREAD_TABLE + ".forum_id=" + Constant.FORUM_TABLE
               + ".id and thread_id=" + Constant.THREAD_TABLE + ".id and "
-              + Constant.USER_TABLE + ".id=user_id");
+              + Constant.USER_TABLE + ".id=user_id order by " + Constant.POST_TABLE+".creation_date desc");
       System.out
           .println("select " + Constant.POST_TABLE + ".thread_id as thread_id, "
               + Constant.THREAD_TABLE + ".name as thread_name, "
@@ -328,7 +355,7 @@ public class ThreadDB {
     }
     return threads;
   }
-  
+
   private void close() throws SQLException {
     if (stm != null) {
       stm.close();
