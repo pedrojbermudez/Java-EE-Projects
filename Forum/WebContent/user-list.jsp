@@ -13,7 +13,7 @@
 	webContent.append(menuFooter.getMenu(session) + "<div id=\"div_body\">");
 	if (session != null && Integer.parseInt(session.getAttribute("id").toString()) == 1) {
 		javascript = "<script type=\"text/javascript\">function setDeletedUser(checkbox) {\n"
-				+ "window.alert($(checkbox).val())\n" + "$.ajax({\n" + "type : 'post',\n"
+				+ "\n" + "$.ajax({\n" + "type : 'post',\n"
 				+ "url : 'delete-user/',\n" + "data : {\n" + "id : $(checkbox).val(),\n"
 				+ "deleted : $(checkbox).prop('checked') == true ? \"y\" : \"n\"\n" + "}\n" + "});\n"
 				+ "}</script>";
