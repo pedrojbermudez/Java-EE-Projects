@@ -23,7 +23,7 @@ import utils.MD5Checksum;
 public class EditUser extends HttpServlet {
 
   /**
-   * 
+   * Servlet to edit an user
    */
   private static final long serialVersionUID = 4182190514156962668L;
   private UserDB db;
@@ -41,24 +41,36 @@ public class EditUser extends HttpServlet {
     // Setting path
     String appPath = request.getServletContext().getRealPath("");
     String savePath = appPath + File.separator + Constant.SAVE_IMAGE_DIR;
-    // getting the file and write in the server and checking type name "path"
-    if(request.getParameter("path").isEmpty()){
+    // Getting the file and write in the server and checking type name "path"
+    if (request.getParameter("path").isEmpty()) {
+      // User changed him/her picture
       Part part = request.getPart("user_profile_picture");
+      // Getting the file name
       fileName = (new ExtractFileName()).extractFileName(part);
       if (!fileName.isEmpty()) {
+        // File name exists
+        // Getting the extension
         String ext = fileName.substring(fileName.lastIndexOf('.'));
+        // Getting MD5
         fileName = (new MD5Checksum(part.getInputStream())).getCheckSum();
         if (!(new File(savePath + File.separator + fileName)).exists()) {
+          // File not exists and write it in server
           part.write(savePath + File.separator + fileName + ext);
         }
+        // Creating the final file name for saving it into database and
+        // replace \ character by two \ to escape it in the database
         fileName = (Constant.SAVE_IMAGE_DIR + File.separator + fileName + ext)
             .replace("\\", "\\\\");
       } else {
+        // There is not file so the final file name will be the picture by
+        // default
         fileName = Constant.PROFILE_PICTURE_DEFAULT;
       }
     } else {
-      fileName = request.getParameter("path"); 
+      // The user doesn't want to change the picture
+      fileName = request.getParameter("path");
     }
+    //Editing the user
     if ((Integer.parseInt(session.getAttribute("id").toString()) == 1
         || Integer.parseInt(session.getAttribute("id").toString()) == Integer
             .parseInt(request.getParameter("user_id")))

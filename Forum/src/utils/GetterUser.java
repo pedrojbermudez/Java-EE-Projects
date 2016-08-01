@@ -15,14 +15,14 @@ public class GetterUser {
   public GetterUser() {
   }
 
-  private int setTotalUser(){
+  private int setTotalUser() {
     return (new UserDB()).getTotalUsers();
   }
-  
-  public int getTotalUser(){
+
+  public int getTotalUser() {
     return setTotalUser();
   }
-  
+
   private void setModUsers(int forumId) {
     sbUser = new StringBuilder();
     UserDB userDB = new UserDB();
@@ -185,14 +185,16 @@ public class GetterUser {
    * @param numberPage
    * @return
    */
-  public String getUserList(int numberPage, int index, int totalElements) {
-    setUserList(numberPage, index, totalElements);
+  public String getSetModUserList(int numberPage, int index,
+      int totalElements) {
+    setSetModUserList(numberPage, index, totalElements);
     return sbUser.toString();
   }
 
-  private void setUserList(int numberPage, int index, int totalElements) {
+  private void setSetModUserList(int numberPage, int index, int totalElements) {
     sbUser = new StringBuilder();
-    ArrayList<String[]> listUser = (new UserDB()).getUsers(index, totalElements);
+    ArrayList<String[]> listUser = (new UserDB()).getUsers(index,
+        totalElements);
     String checkboxName = "mod_user";
     sbUser.append("<form action=\"\" method=\"POST\">");
     for (String[] user : listUser) {
@@ -210,4 +212,40 @@ public class GetterUser {
     }
     sbUser.append("</form>");
   }
+
+  /**
+   * Get all user for using it on moderator list user
+   * 
+   * @param numberPage
+   * @return
+   */
+  public String getSetDeletedUserList(int numberPage, int index,
+      int totalElements) {
+    setSetDeletedUserList(numberPage, index, totalElements);
+    return sbUser.toString();
+  }
+
+  private void setSetDeletedUserList(int numberPage, int index,
+      int totalElements) {
+    sbUser = new StringBuilder();
+    ArrayList<String[]> listUser = (new UserDB()).getUsers(index,
+        totalElements);
+    String checkboxName = "deleted";
+    sbUser.append("<form action=\"\" method=\"POST\">");
+    for (String[] user : listUser) {
+      if (Integer.parseInt(user[3]) > 0) {
+        sbUser.append("<div class=\"div_user\"><a href=\"user.jsp?uid="
+            + user[0] + "\">" + user[1] + " </a><input type=\"checkbox\""
+            + " checked value=\"" + user[0] + "\" name=\"" + checkboxName
+            + "\" onchange=\"setDeletedUser(this)\"></div>");
+      } else {
+        sbUser.append("<div class=\"div_user\"><a href=\"user.jsp?uid="
+            + user[0] + "\">" + user[1] + " </a><input type=\"checkbox\""
+            + " value=\"" + user[0] + "\" name=\"" + checkboxName
+            + "\" onchange=\"setDeletedUser(this)\"></div>");
+      }
+    }
+    sbUser.append("</form>");
+  }
+
 }

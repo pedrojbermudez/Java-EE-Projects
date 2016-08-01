@@ -5,7 +5,7 @@ import database.UserDB;
 public class ExistingUser {
   
   private boolean checkUser(String user, String email){
-    return (new UserDB()).existsUser(user, email);
+    return (new UserDB()).existingUserName(user);
   }
   
   public boolean getCheckUser(String user, String email){

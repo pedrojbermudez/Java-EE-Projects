@@ -5,8 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import constants.Constant;
-
 public class DBConnection {
   private static String database;
   private static String userName;
@@ -39,10 +37,10 @@ public class DBConnection {
       e.printStackTrace();
     }
     try {
+      // Creating a connection with the database
       conn = DriverManager.getConnection(
           "jdbc:mysql://" + host + "/" + database, userName, password);
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return conn;

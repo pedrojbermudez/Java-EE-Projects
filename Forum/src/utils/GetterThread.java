@@ -89,12 +89,13 @@ public class GetterThread {
 
     }
     for (String[] thread : threads) {
+      // Creating each line
       sb.append("<div class=\"div_thread_recent\">"
-          + "<div class=\"div_thread_recent_inner\">"
+          + "<span class=\"span_thread_recent_inner\">"
           + "<a href=\"forum.jsp?fid=" + thread[2] + "\">" + thread[3]
-          + ":</a></div><div class=\"div_thread_recent_inner\">"
+          + ":</a></span><span class=\"span_thread_recent_inner\">"
           + "<a href=\"thread.jsp?tid=" + thread[0] + "\">" + thread[1]
-          + "</a><div></div>");
+          + "</a></span></div>");
     }
     return sb.toString();
   }

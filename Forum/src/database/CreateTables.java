@@ -7,24 +7,23 @@ import java.sql.Statement;
 
 import constants.Constant;
 
+/**
+ * Create the used tables and some datas
+ */
 public class CreateTables {
   Connection conn;
+  DBConnection db;
 
-  /**
-   * Create the used tables
-   */
   public CreateTables() {
-    conn = (new DBConnection()).getConnection();
+    db = new DBConnection();
+    conn = db.getConnection();
     createTables();
-    try {
-      conn.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
   }
 
   private void createTables() {
     Statement stm = null;
+    // Setting user, forum, moderator, thread, post, message, block user
+    // tables.
     String userT = "create table if not exists " + Constant.USER_TABLE
         + " (id int auto_increment not null, name blob, "
         + "surname blob, email blob not null, country blob, state blob, "
@@ -44,7 +43,8 @@ public class CreateTables {
     String postT = "create table if not exists " + Constant.POST_TABLE
         + " (id int auto_increment not null, user_id int not null, "
         + "thread_id int not null, post mediumblob not null, "
-        + "creation_date date not null, modification_date date,  primary key(id));";
+        + "creation_date date not null, modification_date date, "
+        + "deleted tinyint not null, primary key(id));";
     String messageT = "create table if not exists " + Constant.MESSAGE_TABLE
         + " (id int auto_increment not null, message mediumblob not null, "
         + "sender int not null, receiver int not null, creation_date date not null, "
@@ -54,6 +54,7 @@ public class CreateTables {
         + "user_id int not null, blocked_user_id int not null, "
         + "primary key(id));";
     try {
+      // Creating the tables
       stm = conn.createStatement();
       stm.executeUpdate(userT);
       stm.executeUpdate(forumT);
@@ -61,15 +62,26 @@ public class CreateTables {
       stm.executeUpdate(threadT);
       stm.executeUpdate(postT);
       stm.executeUpdate(messageT);
-      stm.executeUpdate(blockedUserT);      
+      stm.executeUpdate(blockedUserT);
+
+      // Setting administrator account
       String fields = "id, user_name, password, profile_picture, is_mod, name, surname, email";
       String values = "1, \"Administrator\", MD5(\"admin\"), \""
-          + Constant.PROFILE_PICTURE_DEFAULT.replace("\\", "\\\\") + "\", 1, \"admin\", \"admin\", \""
-          + Constant.ADMIN_EMAIL + "\"";
+          + Constant.PROFILE_PICTURE_DEFAULT.replace("\\", "\\\\")
+          + "\", 1, \"admin\", \"admin\", \"" + Constant.ADMIN_EMAIL + "\"";
       stm.executeUpdate("replace into " + Constant.USER_TABLE + " (" + fields
           + ") values (" + values + ")");
     } catch (SQLException e) {
-      System.err.println(e.getMessage());
+      System.err.println("Message => " + e.getMessage());
+      System.err.println("SQL State => " + e.getSQLState());
+    } finally {
+      try {
+        if (stm != null) stm.close();
+        if (conn != null) conn.close();
+        db.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
     }
   }
 }

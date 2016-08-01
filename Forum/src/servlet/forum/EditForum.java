@@ -27,17 +27,13 @@ public class EditForum extends HttpServlet {
     for (int i = 0; i < moderators.length; i++) {
       moderators[i] = Integer.parseInt(tmp[i]);
     }
-    
-    // Deleting current moderators
-    if(db.deleteModerators(Integer.parseInt(request.getParameter("forum_id")))){
-      if (db.editForum(moderators, request.getParameter("forum_name"),
-          request.getParameter("forum_description"),
-          Integer.parseInt(request.getParameter("forum_category_id")),
-          Integer.parseInt(request.getParameter("forum_id")))) {
-        response.setHeader("Edit_Forum", "ok");
-      } else {
-        response.setHeader("Edit_Forum", "error");
-      }  
+    if (db.editForum(moderators, request.getParameter("forum_name"),
+        request.getParameter("forum_description"),
+        Integer.parseInt(request.getParameter("forum_category_id")),
+        Integer.parseInt(request.getParameter("forum_id")))) {
+      response.setHeader("Edit_Forum", "ok");
+    } else {
+      response.setHeader("Edit_Forum", "error");
     }
     try {
       response.sendRedirect(

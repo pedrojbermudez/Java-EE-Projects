@@ -28,20 +28,8 @@ public class DeleteForum extends HttpServlet {
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
-
-    int forumId = Integer.parseInt(request.getParameter("forum_id"));
-    ArrayList<Integer> threadIdList = threadDb.getThreadIdList(forumId);
-    boolean donePost = false;
-    for (int i = 0; i < threadIdList.size(); i++) {
-      if (postDb.deletePostbyThread(threadIdList.get(i))) {
-        donePost = true;
-      } else {
-        donePost = false;
-        break;
-      }
-    }
-    if (donePost && threadDb.deleteThreadByForum(forumId)
-        && forumDb.deleteForum(forumId)) {
+    if (forumDb
+        .deleteForum(Integer.parseInt(request.getParameter("forum_id")))) {
       response.setHeader("Delete_Forum", "ok");
     } else {
       response.setHeader("Delete_Forum", "error");

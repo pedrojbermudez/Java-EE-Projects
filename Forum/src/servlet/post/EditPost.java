@@ -20,13 +20,15 @@ public class EditPost extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
     System.out.println(request.getParameter("post_post"));
     if (db.editPost(Integer.parseInt(request.getParameter("post_id")),
-        request.getParameter("post_post"))) {
+        request.getParameter("post_post").replace("\n", "<br>"))) {
       response.setHeader("Edit_Post", "ok");
     } else {
       response.setHeader("Edit_Post", "error");
     }
     try {
-      response.sendRedirect("/Forum/index.jsp");
+      response.sendRedirect("/Forum/thread.jsp?tid="
+          + Integer.parseInt(request.getParameter("post_thread_id")) + "#post="
+          + request.getParameter("post_id"));
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }

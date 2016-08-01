@@ -61,7 +61,9 @@ public class MenuFooter {
         + "<a id=\"anchor_menu_cat\" href=\"category.jsp\">"
         + "Category Management</a></span><span class=\"span_menu_cat\">"
         + "<a id=\"anchor_menu_cat\" href=\"mod-user.jsp\">"
-        + "Moderators User List</a></span></div>";
+        + "Moderators User List</a></span><span class=\"span_menu_cat\">"
+        + "<a id=\"anchor_menu_cat\" href=\"user-list.jsp\">User list"
+        + "</a></span></div>";
   }
 
   public String getMenu(HttpSession session) {

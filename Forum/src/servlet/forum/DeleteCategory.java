@@ -21,7 +21,6 @@ public class DeleteCategory extends HttpServlet {
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
-
     if (db.deleteCategory(
         Integer.parseInt(request.getParameter("category_id")))) {
       response.setHeader("Delete_Category", "ok");

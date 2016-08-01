@@ -1,8 +1,6 @@
 
 package servlet.user;
 
-import java.io.IOException;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,10 +21,10 @@ public class SetModUser extends HttpServlet {
    */
   protected void doPost(HttpServletRequest request,
       HttpServletResponse response) {
-    System.out.println("valor de user_id " + request.getParameter("user_id"));
-    System.out.println("valor de is_mod : " + request.getParameter("is_mod"));
     if (request.getSession() != null && Integer
         .parseInt(request.getSession().getAttribute("id").toString()) == 1) {
+      // User logged was administrator
+      // Changing normal user to moderator user
       (new UserDB()).setModUserList(
           Integer.parseInt(request.getParameter("user_id")),
           request.getParameter("is_mod").equals("y") ? true : false);

@@ -1,3 +1,4 @@
+
 package database;
 
 import java.sql.Connection;
@@ -7,6 +8,14 @@ import java.sql.SQLException;
 
 import constants.Constant;
 
+/**
+ * Class related to operation with database about message table
+ * 
+ * Available in version 2
+ * 
+ * @author pedro
+ *
+ */
 public class MessageDB {
   private DBConnection db;
   private Connection conn;
@@ -45,8 +54,8 @@ public class MessageDB {
     PreparedStatement stm = null;
     try {
       conn = db.getConnection();
-      stm = conn
-          .prepareStatement("delete from " + Constant.MESSAGE_TABLE + " where id=?");
+      stm = conn.prepareStatement(
+          "delete from " + Constant.MESSAGE_TABLE + " where id=?");
       stm.setInt(1, id);
       stm.executeUpdate();
       done = true;
