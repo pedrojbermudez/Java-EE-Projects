@@ -22,8 +22,15 @@ public class Pagination {
   public void setElementsPerPage(int elementsPerPage) {
     this.elementsPerPage = elementsPerPage;
   }
+  
+  public int getTotalPage(){
+     return this.totalElements % this.elementsPerPage == 0
+        ? this.totalElements / this.elementsPerPage
+        : 1 + (this.totalElements / this.elementsPerPage);
+  }
 
   /**
+   * Getting the pagination
    * 
    * @param cp
    *          Current page
@@ -33,9 +40,7 @@ public class Pagination {
    */
   public String getPag(int cp, String url, String queryPart) {
     // Establishing total pages.
-    int tp = this.totalElements % this.elementsPerPage == 0
-        ? this.totalElements / this.elementsPerPage
-        : 1 + (this.totalElements / this.elementsPerPage);
+    int tp = getTotalPage();
     if (this.totalElements == 0 || this.totalElements <= this.elementsPerPage
         || tp <= 1) {
       // Returning nothing

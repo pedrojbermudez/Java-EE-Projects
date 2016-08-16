@@ -2,6 +2,7 @@
 package servlet.forum;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,12 +19,13 @@ public class NewForum extends HttpServlet {
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
     HttpSession session = request.getSession();
+    // Getting and saving moderators
     String[] tmp = request.getParameterValues("forum_mod_users");
-
     int[] moderators = new int[tmp.length];
     for (int i = 0; i < moderators.length; i++) {
       moderators[i] = Integer.parseInt(tmp[i]);
     }
+    // Creating a new forum
     int forumId = session != null
         && Integer.parseInt(session.getAttribute("id").toString()) == 1
             ? (new ForumDB()).newForum(moderators,
@@ -32,11 +34,19 @@ public class NewForum extends HttpServlet {
                 Integer.parseInt(request.getParameter("forum_category_id")))
             : -1;
     try {
+      // Going to the new forum
       if (forumId != -1) {
         response.sendRedirect("/Forum/forum.jsp?cid="
             + request.getParameter("forum_category_id") + "&fid=" + forumId);
       } else {
-        response.sendRedirect("/Forum/index.jsp");
+        // Going to the category id
+        PrintWriter out = response.getWriter();
+        out.println("<script type=\"text/javascript\">");
+        out.println(
+            "window.alert(\"There was an error while new forum was creating.\")");
+        out.println("</script>");
+        response.sendRedirect("/Forum/forum.jsp?cid="
+            + request.getParameter("forum_category_id"));
       }
     } catch (IOException e) {
       System.err.println(e.getMessage());

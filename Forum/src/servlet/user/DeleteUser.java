@@ -3,7 +3,6 @@ package servlet.user;
 
 import java.io.IOException;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +27,7 @@ public class DeleteUser extends HttpServlet {
       // Delete user was succeed
       response.setHeader("Delete_User", "ok");
     } else {
+      // Delete user was failed
       response.setHeader("Delete_User", "error");
     }
     response.sendRedirect("index.jsp");

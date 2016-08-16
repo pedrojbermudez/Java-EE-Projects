@@ -27,6 +27,7 @@ public class EditForum extends HttpServlet {
     for (int i = 0; i < moderators.length; i++) {
       moderators[i] = Integer.parseInt(tmp[i]);
     }
+    // Editing an existing forum
     if (db.editForum(moderators, request.getParameter("forum_name"),
         request.getParameter("forum_description"),
         Integer.parseInt(request.getParameter("forum_category_id")),
@@ -36,6 +37,7 @@ public class EditForum extends HttpServlet {
       response.setHeader("Edit_Forum", "error");
     }
     try {
+      // Going to the edited forum
       response.sendRedirect(
           "/Forum/forum.jsp?cid=" + request.getParameter("forum_category_id")
               + "&fid=" + request.getParameter("forum_forum_id"));

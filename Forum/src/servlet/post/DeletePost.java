@@ -2,6 +2,7 @@
 package servlet.post;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,14 +23,21 @@ public class DeletePost extends HttpServlet {
     boolean administrator = Integer
         .parseInt(request.getAttribute("id").toString()) == 0 ? true : false;
     HttpSession session = request.getSession();
-    if (administrator
-        && db.deletePost(Integer.parseInt(request.getParameter("id")),
-            Integer.parseInt(session.getAttribute("id").toString()))) {
-      response.setHeader("Delete_Post", "ok");
-    } else {
-      response.setHeader("Delete_Post", "error");
-    }
     try {
+      // Deleting post
+      if (administrator
+          && db.deletePost(Integer.parseInt(request.getParameter("id")),
+              Integer.parseInt(session.getAttribute("id").toString()))) {
+        response.setHeader("Delete_Post", "ok");
+      } else {
+        // An error was occurred 
+        PrintWriter out = response.getWriter();
+        out.println("<script type=\"text/javascript\">");
+        out.println(
+            "window.alert(\"There was an error while category was deleting.\")");
+        out.println("</script>");
+        response.setHeader("Delete_Post", "error");
+      }
       response.sendRedirect("/Forum/index,jsp");
     } catch (IOException e) {
       System.out.println(e.getMessage());

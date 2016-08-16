@@ -2,6 +2,7 @@
 package servlet.forum;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServlet;
@@ -28,14 +29,21 @@ public class DeleteForum extends HttpServlet {
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
-    if (forumDb
-        .deleteForum(Integer.parseInt(request.getParameter("forum_id")))) {
-      response.setHeader("Delete_Forum", "ok");
-    } else {
-      response.setHeader("Delete_Forum", "error");
-    }
+    // Deleting forum, threads and posts
+    
     try {
-      response.sendRedirect("/Forum/index.jsp");
+      if (forumDb
+          .deleteForum(Integer.parseInt(request.getParameter("forum_id")))) {
+        response.setHeader("Delete_Forum", "ok");
+        response.sendRedirect("/Forum/index.jsp");
+      } else {
+        PrintWriter out = response.getWriter();
+        out.println("<script type=\"text/javascript\">");
+        out.println("window.alert(\"There was an error while forum was deleting.\")");
+        out.println("</script>");
+        response.setHeader("Delete_Forum", "error");
+        response.sendRedirect("/Forum/index.jsp");
+      }
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }

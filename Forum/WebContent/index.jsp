@@ -17,8 +17,8 @@
         + session.getAttribute("deleted").toString() + "\")</script>");
     session.removeAttribute("deleted");
   }
-  content.append(menuFooter.getMenu(session) + "<div id=\"div_body\">"
-      + (new GetterThread()).get30Threads() + "</div>"
+  content.append(menuFooter.getMenu(session) + "<br><div id=\"div_body\">"
+      + (new GetterThread()).get30Threads() + "</div><br>"
       + menuFooter.getFooter());
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

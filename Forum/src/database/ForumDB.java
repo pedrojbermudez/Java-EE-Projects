@@ -32,19 +32,23 @@ public class ForumDB {
    *          A little description of the category
    * @return true if it's done otherwise false
    */
-  public boolean newCategory(String name, String description) {
-    boolean done = false;
+  public int newCategory(String name, String description) {
+    int categoryId = -1;
     // Creating a new connection
     DBConnection db = new DBConnection();
     conn = db.getConnection();
     PreparedStatement stm = null;
     try {
       // Inserting a new category into database
-      stm = conn.prepareStatement("insert into " + Constant.FORUM_TABLE
-          + " (name, description) VALUES (?, ?)");
+      stm = conn.prepareStatement(
+          "insert into " + Constant.FORUM_TABLE
+              + " (name, description) VALUES (?, ?)",
+          Statement.RETURN_GENERATED_KEYS);
       stm.setString(1, name); // name
       stm.setString(2, description); // description
       stm.executeUpdate();
+      ResultSet rs = stm.getGeneratedKeys(); // last id
+      categoryId = rs.next() ? rs.getInt(1) : -1;
     } catch (SQLException e) {
       System.err.println(e.getMessage());
     } finally {
@@ -57,7 +61,7 @@ public class ForumDB {
         System.err.println(e.getMessage());
       }
     }
-    return done;
+    return categoryId;
   }
 
   /**

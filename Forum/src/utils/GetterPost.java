@@ -56,7 +56,7 @@ public class GetterPost {
       // writing post content
       sb.append("<div class=\"div_post_content\"><div class=\"div_post_date\">"
           + "<span>Created on: " + post[3] + "</span></div><div class=\"div_post\">"
-          + "<span class=\"span_post\">" + post[2] + "</span></div>"
+          + "<span class=\"span_post\" id=\"post"+post[0]+"\">" + post[2] + "</span></div>"
           + "<div class=\"div_modification_date\">"
           + (post[4] != null ? "Modified on: " + post[4] : "") + "</div></div>");
       // adding edit anchor
