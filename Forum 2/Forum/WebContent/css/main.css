@@ -1,0 +1,82 @@
+@CHARSET "ISO-8859-1";
+
+a {
+	text-decoration: none;
+}
+
+#div_menu {
+	width: 1024px;
+	background-color: green;
+	margin-left: auto;
+	margin-right: auto;	
+}
+
+#div_footer{
+	width: 1024px;
+	background-color: green;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.span_menu_header {
+	margin-left: 4px;
+	margin-right: 4px;
+	color: white;
+	font-size-adjust: 0.5;
+}
+
+.span_menu_cat{
+	margin-left: 4px;
+	margin-right: 4px;
+	color: white;
+}
+
+.span_anchor_login{
+	font-size-adjust: 0.25;
+	color: white;
+}
+
+#anchor_new_user{
+	text-decoration : none;
+	color: grey;
+}
+
+#div_login{
+width: 1024px;
+margin-left: auto;
+margin-right: auto;
+}
+
+#span_menu_user_name{
+	color: white;
+}
+
+.span_input_login{
+	color: white;
+	margin-right: 15px;	
+}
+
+#div_menu_cat{
+	width: 1024px;
+	background-color: green;
+}
+
+#anchor_menu_cat{
+	text-decoration: none;
+	color: white;
+}
+
+#div_body{
+	background-color: rgb(0,200,0);
+	width: 1024px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.span_menu_user_name{
+	margin-right: 5px;
+}
+
+.span_thread_recent_inner{
+	margin-right: 5px;
+}
