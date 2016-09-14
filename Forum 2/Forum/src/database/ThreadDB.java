@@ -302,56 +302,36 @@ public class ThreadDB {
       sql = "select " + Constant.THREAD_TABLE + "."
           + Constant.THREAD_THREAD_ID_FIELD_NAME + ", MAX("
           + Constant.POST_TABLE + "." + Constant.POST_POST_ID_FIELD_NAME
-          + ") as order_post_id from " + Constant.POST_TABLE + ", "
-          + Constant.THREAD_TABLE + " where " + Constant.THREAD_TABLE + "."
+          + ") as order_post_id, " + Constant.THREAD_TABLE + "."
+          + Constant.THREAD_NAME_FIELD_NAME + ", " + Constant.THREAD_TABLE + "."
+          + Constant.THREAD_USER_ID_FIELD_NAME + ", " + Constant.USER_TABLE
+          + "." + Constant.USER_USER_NAME_FIELD_NAME + " from "
+          + Constant.POST_TABLE + ", " + Constant.THREAD_TABLE + ", "
+          + Constant.USER_TABLE + " where " + Constant.THREAD_TABLE + "."
           + Constant.THREAD_FORUM_ID_FIELD_NAME + "=? and "
-          + Constant.POST_TABLE + "." + Constant.THREAD_THREAD_ID_FIELD_NAME
-          + "=" + Constant.THREAD_TABLE + "."
-          + Constant.THREAD_THREAD_ID_FIELD_NAME + " group by "
-          + Constant.POST_TABLE + "." + Constant.POST_THREAD_ID_FIELD_NAME
-          + " order by order_post_id desc limit "
-          + ((index - 1) * totalElements) + ", " + totalElements;
+          + Constant.THREAD_TABLE + "." + Constant.THREAD_USER_ID_FIELD_NAME
+          + "=" + Constant.USER_TABLE + "." + Constant.USER_USER_ID_FIELD_NAME
+          + " and " + Constant.THREAD_TABLE + "."
+          + Constant.THREAD_THREAD_ID_FIELD_NAME + "=" + Constant.POST_TABLE
+          + "." + Constant.POST_THREAD_ID_FIELD_NAME + " group by "
+          + Constant.THREAD_THREAD_ID_FIELD_NAME
+          + " order by order_post_id desc limit ?,?";
       stm = conn.prepareStatement(sql);
       stm.setInt(1, forumId);
+      stm.setInt(2, ((index - 1) * totalElements));
+      stm.setInt(3, totalElements);
       ResultSet rs = stm.executeQuery();
-      String threadId;
       while (rs.next()) {
-        String threadName;
-        String userId;
-        String userName;
-        ResultSet rs2;
-        // Getting thread_name and user_id from thread table
-        threadId = Integer.toString(rs.getInt("thread_id"));
-        sql = "select " + Constant.THREAD_NAME_FIELD_NAME + ", "
-            + Constant.THREAD_USER_ID_FIELD_NAME + " from "
-            + Constant.THREAD_TABLE + " where "
-            + Constant.THREAD_THREAD_ID_FIELD_NAME + "=" + threadId;
-        stm = conn.prepareStatement(sql);
-        rs2 = stm.executeQuery();
-        if (rs2.next()) {
-          threadName = rs2.getString(Constant.THREAD_NAME_FIELD_NAME);
-          userId = Integer
-              .toString(rs2.getInt(Constant.THREAD_USER_ID_FIELD_NAME));
-        } else {
-          threadName = "";
-          userId = "";
-        }
-        // Getting user_name from user table
-        sql = "select " + Constant.USER_USER_NAME_FIELD_NAME + " from "
-            + Constant.USER_TABLE + " where " + Constant.USER_USER_ID_FIELD_NAME
-            + "=" + userId;
-        stm = conn.prepareStatement(sql);
-        rs2 = stm.executeQuery();
-        if (rs2.next())
-          userName = rs2.getString(Constant.USER_USER_NAME_FIELD_NAME);
-        else userName = "";
         // Saving the data into a temporal Array String and add it to an
         // ArrayList<String[]>
-        String[] tmp = { threadId, threadName, userId, userName };
+        String[] tmp = { Integer.toString(rs.getInt("thread_id")),
+            rs.getString(Constant.THREAD_NAME_FIELD_NAME),
+            Integer.toString(rs.getInt(Constant.THREAD_USER_ID_FIELD_NAME)),
+            rs.getString(Constant.USER_USER_NAME_FIELD_NAME) };
         list.add(tmp);
       }
       long end = System.currentTimeMillis();
-      System.out.println("Time taken => " + (end - start));
+      System.out.println("SQL TIME GETTHREAD => " + (end - start));
     } catch (SQLException e) {
       System.err.println("Error in getThreadList():");
       System.err.println("Message => " + e.getMessage());
