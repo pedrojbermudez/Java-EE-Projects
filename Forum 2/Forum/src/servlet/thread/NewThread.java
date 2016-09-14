@@ -28,7 +28,6 @@ public class NewThread extends HttpServlet {
     int postId = session != null && session.getAttribute("id") != null
         ? (new PostDB()).newPost(
             Integer.parseInt(session.getAttribute("id").toString()), threadId,
-            Integer.parseInt(request.getParameter("thread_forum_id")),
             request.getParameter("thread_post"))
         : -1;
     try {

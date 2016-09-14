@@ -34,7 +34,7 @@ public class PostDB {
    *          Post written
    * @return The post id, in case there is a problem post id will be -1
    */
-  public int newPost(int userId, int threadId, int forumId, String post) {
+  public int newPost(int userId, int threadId, String post) {
     int postId = -1;
     PreparedStatement stm = null;
     // Creating a new connection
@@ -45,16 +45,14 @@ public class PostDB {
       stm = conn.prepareStatement("insert into " + Constant.POST_TABLE + " ("
           + Constant.POST_USER_ID_FIELD_NAME + ", "
           + Constant.POST_THREAD_ID_FIELD_NAME + ", "
-          + Constant.POST_FORUM_ID_FIELD_NAME + ", "
           + Constant.POST_POST_FIELD_NAME + ", "
           + Constant.POST_CREATION_DATE_FIELD_NAME + ", "
           + Constant.POST_MODIFICATION_DATE_FIELD_NAME
-          + ") values (?,?,?,?,now(),?)", Statement.RETURN_GENERATED_KEYS);
+          + ") values (?,?,?,now(),?)", Statement.RETURN_GENERATED_KEYS);
       stm.setInt(1, userId); // user_id
       stm.setInt(2, threadId); // thread_id
-      stm.setInt(3, forumId); // thread_id
-      stm.setString(4, post); // post
-      stm.setNull(5, java.sql.Types.DATE); // modification_date (null)
+      stm.setString(3, post); // post
+      stm.setNull(4, java.sql.Types.DATE); // modification_date (null)
       stm.executeUpdate();
       // Getting the last post id
       ResultSet rs = stm.getGeneratedKeys();

@@ -73,7 +73,7 @@ public class MessageDB {
   }
 
   /**
-   * Delete a message from the database.
+   * Delete a message from the database (for now this method won't be used
    * 
    * @param messageId
    *          The message id we want to delete

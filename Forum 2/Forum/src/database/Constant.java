@@ -52,7 +52,6 @@ public final class Constant {
   protected static String POST_POST_ID_FIELD_NAME = "post_id";
   protected static String POST_USER_ID_FIELD_NAME = "user_id";
   protected static String POST_THREAD_ID_FIELD_NAME = "thread_id";
-  protected static String POST_FORUM_ID_FIELD_NAME = "forum_id";
   protected static String POST_POST_FIELD_NAME = "post";
   protected static String POST_CREATION_DATE_FIELD_NAME = "creation_date";
   protected static String POST_MODIFICATION_DATE_FIELD_NAME = "modification_date";

@@ -80,7 +80,6 @@ public class CreateTables {
       String postT = "create table if not exists " + Constant.POST_TABLE + " ("
           + Constant.POST_POST_ID_FIELD_NAME + " int auto_increment not null, "
           + Constant.POST_USER_ID_FIELD_NAME + " int not null, "
-          + Constant.POST_FORUM_ID_FIELD_NAME + ""
           + Constant.POST_THREAD_ID_FIELD_NAME + " int not null, "
           + Constant.POST_POST_FIELD_NAME + " mediumblob not null, "
           + Constant.POST_CREATION_DATE_FIELD_NAME + " datetime not null, "
@@ -186,19 +185,6 @@ public class CreateTables {
       rs = stm.executeQuery(checkBlockUser);
       if (!rs.next()) {
         stm.executeUpdate(sqlIndexBlockUser);
-      }
-      // SQL sentence to check and create an index for email on user table
-      String indexNamePostForumId = "index_post_forum_id";
-      String checkIndexPostForumId = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE"
-          + " `TABLE_CATALOG` = 'def' AND `TABLE_SCHEMA` = DATABASE() AND "
-          + "`TABLE_NAME` = \"" + Constant.POST_TABLE
-          + "\" AND `INDEX_NAME` = \"" + indexNamePostForumId + "\"";
-      String sqlIndexPostForumId = "alter table " + Constant.POST_TABLE
-          + " add index " + indexNamePostForumId + " ("
-          + Constant.POST_FORUM_ID_FIELD_NAME + ")";
-      rs = stm.executeQuery(checkIndexPostForumId);
-      if (!rs.next()) {
-        stm.executeUpdate(sqlIndexPostForumId);
       }
       // SQL sentence to check and create an index for user_name and password on
       // user table

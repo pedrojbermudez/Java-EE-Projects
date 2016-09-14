@@ -285,69 +285,79 @@ public class ThreadDB {
    *          Current page
    * @param totalElements
    *          Total elements displayed on screen
-   * @return ArrayList < String[] > => id(0), name(1), author(2), user_name(3)
+   * @return ArrayList < String[] > => thread_id(0), thread_name(1), user_id(2),
+   *         user_name(3)
    */
   public ArrayList<String[]> getThreadList(int forumId, int index,
       int totalElements) {
-    long start = System.currentTimeMillis();
     ArrayList<String[]> list = new ArrayList<>();
     stm = null;
     String sql = "";
     try {
+      long start = System.currentTimeMillis();
       // Creating a new connection
       db = new DBConnection();
       conn = db.getConnection();
       // Getting threads, by default 25 threads per page
-      sql = "select thread_id from post where forum_id=? group by thread_id "
-          + "order by MAX(post_id) desc limit " + ((index - 1) * totalElements)
-          + ", " + totalElements;
-      System.out.println("sql=> " + sql);
+      sql = "select " + Constant.THREAD_TABLE + "."
+          + Constant.THREAD_THREAD_ID_FIELD_NAME + ", MAX("
+          + Constant.POST_TABLE + "." + Constant.POST_POST_ID_FIELD_NAME
+          + ") as order_post_id from " + Constant.POST_TABLE + ", "
+          + Constant.THREAD_TABLE + " where " + Constant.THREAD_TABLE + "."
+          + Constant.THREAD_FORUM_ID_FIELD_NAME + "=? and "
+          + Constant.POST_TABLE + "." + Constant.THREAD_THREAD_ID_FIELD_NAME
+          + "=" + Constant.THREAD_TABLE + "."
+          + Constant.THREAD_THREAD_ID_FIELD_NAME + " group by "
+          + Constant.POST_TABLE + "." + Constant.POST_THREAD_ID_FIELD_NAME
+          + " order by order_post_id desc limit "
+          + ((index - 1) * totalElements) + ", " + totalElements;
       stm = conn.prepareStatement(sql);
       stm.setInt(1, forumId);
       ResultSet rs = stm.executeQuery();
-      ResultSet rs2;
-      long end = System.currentTimeMillis();
-      System.out.println("Time => " + (end-start));
+      String threadId;
       while (rs.next()) {
-        // Setting user_id, thread_id and forum_id as String
-        String threadId = Integer.toString(rs.getInt("thread_id"));
-        // Getting the user name from a user (just get one user)
-        sql = "select " + Constant.THREAD_USER_ID_FIELD_NAME + ", "
-            + Constant.THREAD_NAME_FIELD_NAME + " from " + Constant.THREAD_TABLE
-            + " where " + Constant.THREAD_THREAD_ID_FIELD_NAME + "=" + threadId;
-        System.out.println("SQL thread => " + sql);
-        stm = conn.prepareStatement(sql);
-        rs2 = stm.executeQuery();
-        String userId;
         String threadName;
-        if(rs2.next()){
-          userId = Integer.toString(rs2.getInt(Constant.THREAD_USER_ID_FIELD_NAME));
-          threadName = rs2.getString(Constant.THREAD_NAME_FIELD_NAME);
-        } else {
-          userId = "";
-          threadName = "";
-        }
-        sql = "select " + Constant.USER_USER_NAME_FIELD_NAME
-            + " from " + Constant.USER_TABLE
-            + " where " + Constant.USER_USER_ID_FIELD_NAME + "=" + userId;
-        System.out.println("SQL user => " + sql);
+        String userId;
+        String userName;
+        ResultSet rs2;
+        // Getting thread_name and user_id from thread table
+        threadId = Integer.toString(rs.getInt("thread_id"));
+        sql = "select " + Constant.THREAD_NAME_FIELD_NAME + ", "
+            + Constant.THREAD_USER_ID_FIELD_NAME + " from "
+            + Constant.THREAD_TABLE + " where "
+            + Constant.THREAD_THREAD_ID_FIELD_NAME + "=" + threadId;
         stm = conn.prepareStatement(sql);
         rs2 = stm.executeQuery();
-        String userName = rs2.next()
-            ? rs2.getString(Constant.USER_USER_NAME_FIELD_NAME) : "";
+        if (rs2.next()) {
+          threadName = rs2.getString(Constant.THREAD_NAME_FIELD_NAME);
+          userId = Integer
+              .toString(rs2.getInt(Constant.THREAD_USER_ID_FIELD_NAME));
+        } else {
+          threadName = "";
+          userId = "";
+        }
+        // Getting user_name from user table
+        sql = "select " + Constant.USER_USER_NAME_FIELD_NAME + " from "
+            + Constant.USER_TABLE + " where " + Constant.USER_USER_ID_FIELD_NAME
+            + "=" + userId;
+        stm = conn.prepareStatement(sql);
+        rs2 = stm.executeQuery();
+        if (rs2.next())
+          userName = rs2.getString(Constant.USER_USER_NAME_FIELD_NAME);
+        else userName = "";
         // Saving the data into a temporal Array String and add it to an
         // ArrayList<String[]>
         String[] tmp = { threadId, threadName, userId, userName };
         list.add(tmp);
       }
+      long end = System.currentTimeMillis();
+      System.out.println("Time taken => " + (end - start));
     } catch (SQLException e) {
       System.err.println("Error in getThreadList():");
       System.err.println("Message => " + e.getMessage());
       System.err.println("SQL state => " + e.getSQLState());
       System.err.println("SQL sentence => " + sql);
       System.err.println("1? => " + forumId);
-      System.err.println("2? => " + index);
-      System.err.println("3? => " + totalElements);
     } finally {
       try {
         // Closing all connection and sockets
@@ -361,6 +371,7 @@ public class ThreadDB {
       }
     }
     return list;
+
   }
 
   /**

@@ -26,7 +26,7 @@ public class NewPost extends HttpServlet {
     int forumId = Integer.parseInt(request.getParameter("post_forum_id"));
     int postId = session != null && session.getAttribute("id") != null
         ? db.newPost(Integer.parseInt(session.getAttribute("id").toString()),
-            threadId, forumId, request.getParameter("post_post").replace("\n", "<br>"))
+            threadId, request.getParameter("post_post").replace("\n", "<br>"))
         : -1;
     try {
       if (postId != -1) {
