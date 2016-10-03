@@ -1,0 +1,10 @@
+@CHARSET "ISO-8859-1";
+
+.span_forum_name {
+	font-size: 25px;
+}
+
+.div_edit {
+	display: inline;
+	margin-right: 5px;	
+}
